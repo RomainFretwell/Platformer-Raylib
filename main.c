@@ -26,35 +26,41 @@ void ToggleFullscreenWindow(){
     screenRatio = currentScreenSize.width / smallScreenSize.width;
 }
 
-void clearMap(int map[], int width, int height){
-    for (int x = 0; x < width; x++){
-        for (int y = 0; y < height; y++){
-            map[x*height + y] = 0;
+void clearMap(int map[], int mapWidth, int mapHeight){
+    for (int x = 0; x < mapWidth; x++){
+        for (int y = 0; y < mapHeight; y++){
+            map[x*mapHeight + y] = 0;
         }
     }
 }
 
-void initializeMap(int map[], int width, int height){
-    for (int x = 0; x < width; x++){
-        for (int y = 0; y < height; y++){
-            map[x*height + y] = 0; // changer pour copier ou upload tableau d'un autre fichier (faire un dossier map)
+void initializeMap(int map[], int mapWidth, int mapHeight){
+    for (int x = 0; x < mapWidth; x++){
+        for (int y = 0; y < mapHeight; y++){
+            map[x*mapHeight + y] = 0; // changer pour copier ou upload tableau d'un autre fichier (faire un dossier map)
         }
     }
 
     // map de test en attendant ...
-    for (int x = 0; x < width; x++){
-        map[x*height + height - 1] = 1;
-        map[x*height + height - 2] = 2;
+    for (int x = 0; x < mapWidth; x++){
+        map[x*mapHeight + mapHeight - 1] = 1;
+        map[x*mapHeight + mapHeight - 2] = 2;
     }
-    for (int x = 20; x < width; x++){
-        map[x*height + height - 3] = 4;
+    for (int x = 20; x < mapWidth; x++){
+        map[x*mapHeight + mapHeight - 3] = 4;
     }
-    for (int x = 25; x < width; x+=3){
-        map[x*height + height - 4] = 3;
+    for (int x = 25; x < mapWidth; x+=3){
+        map[x*mapHeight + mapHeight - 4] = 3;
     }
-    for (int x = 0; x < width; x++){
-        map[x*height] = 1;
-        map[x*height + 1] = 4;
+    for (int x = 0; x < mapWidth; x++){
+        map[x*mapHeight] = 1;
+        map[x*mapHeight + 1] = 1;
+    }
+    for (int y = 0; y < mapHeight; y++){
+        map[y] = 1;
+        map[y + mapHeight] = 1;
+        map[y + (mapWidth-1)*mapHeight] = 1;
+        map[y + (mapWidth-2)*mapHeight] = 1;
     }
 }
 
@@ -166,6 +172,21 @@ void handleCollisions(Entity ent, int map[], Camera2D camera){
 int canJump(Entity ent){
     return (ent.position.y >= currentScreenSize.height-(2*blockSize*sizeCoef + ent.texture.height)*screenRatio);
 }
+
+void limitCameraMap(Camera2D * camera){
+    if (camera->target.x < camera->offset.x){
+        camera->target.x = camera->offset.x;
+    }
+    if (camera->target.x > camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.width){
+        camera->target.x = camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.width;
+    }
+    if (camera->target.y < camera->offset.y){
+        camera->target.y = camera->offset.y;
+    }
+    if (camera->target.y > camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.height){
+        camera->target.y = camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.height;
+    }
+}
 // remplacer par colision // && cooldown(variable, jumpCooldown)
 // reset timer cooldown
 
@@ -218,8 +239,8 @@ int main(){
     Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
 
     // Map initialization
-    mapSizeX = 64;
-    mapSizeY = 36;
+    mapSizeX = 150;
+    mapSizeY = 70;
     int map[mapSizeX * mapSizeY];
     clearMap(map, mapSizeX, mapSizeY);
     initializeMap(map, mapSizeX, mapSizeY);
@@ -544,10 +565,13 @@ int main(){
         
         camera.target.x = player.position.x * screenRatio;
         camera.target.y = player.position.y * screenRatio;
-        
+
         camera.offset.x = currentScreenSize.width/2;
         camera.offset.y = currentScreenSize.height/2;
         
+        limitCameraMap(&camera);
+        
+
         if (IsKeyPressed(KEY_P)){
             camera.zoom += 0.1;
         }
