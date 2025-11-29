@@ -17,13 +17,13 @@ void drawBlock(int x, int y, Block block){
     DrawTextureEx(block.texture, (Vector2){x*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio}, 0, sizeCoef*screenRatio, WHITE);
 }
 
-void drawBlockHitbox(int x, int y, Block block, Color color){
-    float px = x * blockSize * sizeCoef * screenRatio;
-    float py = y * blockSize * sizeCoef * screenRatio;
-    float pw = block.texture.width * sizeCoef * screenRatio;
-    float ph = block.texture.height * sizeCoef * screenRatio;
+void drawBlockHitbox(int x, int y, Color color){
+    float hitX = x * blockSize * sizeCoef * screenRatio;
+    float hitY = y * blockSize * sizeCoef * screenRatio;
+    float hitW = blockSize * sizeCoef * screenRatio;
+    float hitH = blockSize * sizeCoef * screenRatio;
 
-    DrawRectangleLinesEx((Rectangle){ px, py, pw, ph }, 1.0f, color);
+    DrawRectangleLinesEx((Rectangle){hitX, hitY, hitW, hitH}, 1.0f, color);
 }
 
 void drawMap(int map[], Block blockID[]){
@@ -34,7 +34,7 @@ void drawMap(int map[], Block blockID[]){
                 i = x*mapSizeY + y;
                 if (blockID[map[i]].solid){ // if solid && showBlockHitbox (càd pas de l'air ou de l'eau)
                     drawBlock(x, y, blockID[map[i]]);
-                    drawBlockHitbox(x, y, blockID[map[i]], BLACK);
+                    drawBlockHitbox(x, y, BLACK);
                 }
             }
         }

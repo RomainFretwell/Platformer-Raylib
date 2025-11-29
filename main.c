@@ -129,7 +129,7 @@ void indexToHitbox(int index, Hitbox *hitbox){
     //rectToPoints(&(*hitbox)); // à changer
 }
 
-void handleCollisions(Entity ent, int map[], Camera2D camera, Block block){ // enlever camera quand fini de test
+void handleCollisions(Entity ent, int map[], Camera2D camera){
     Hitbox blockHitbox;
     int n;
     int centerBlock = findBlockMap(ent, mapSizeX, mapSizeY);
@@ -141,17 +141,19 @@ void handleCollisions(Entity ent, int map[], Camera2D camera, Block block){ // e
                 //drawHitbox(blockHitbox, BLUE);
                 rectToPoints(&blockHitbox);
                 if (checkCollisionHitboxes(ent.hitbox, blockHitbox)){ // remplacer par while ensuite
-                    // Convertir l'index n en coordonnées de grille (x et y en nombre de blocks)
+                    
+                    /*
                     int blockX = n / mapSizeY;
                     int blockY = n % mapSizeY;
                     
-                    drawBlockHitbox(blockX, blockY, block, BLUE);
+                    drawBlockHitbox(blockX, blockY, BLUE);
                     // pas sensé draw car pas entre BeginDrawing et EndDrawing
+                    
                     const char * test1 = TextFormat("Block grid X = %d", blockX);
                     DrawText(test1, 310, 50, 20, BLACK);
                     const char * test2 = TextFormat("Block grid Y = %d", blockY);
                     DrawText(test2, 310, 70, 20, BLACK);
-
+                    */
 
 
                     // décaler position de 1 dans la bonne direction (selon vitesse ?)
@@ -531,6 +533,8 @@ int main(){
         updateHitboxEntity(&bow);
         updateHitboxEntity(&arrow);
 
+        handleCollisions(player, map, camera);
+
 
 // ----------------------------------------------------------------------------------------
 //                                   Drawing
@@ -602,9 +606,6 @@ int main(){
             drawHitbox(arrow.hitbox, ORANGE);
             drawHitbox(bow.hitbox, YELLOW);
         }
-
-        // Afficher les hitboxes de collision avec les blocs
-        handleCollisions(player, map, camera, dirt);
 
         // test croix player
         if (IsKeyDown(KEY_C)){
