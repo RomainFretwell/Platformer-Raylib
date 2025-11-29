@@ -17,14 +17,13 @@ void drawBlock(int x, int y, Block block){
     DrawTextureEx(block.texture, (Vector2){x*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio}, 0, sizeCoef*screenRatio, WHITE);
 }
 
-void drawBlockHitbox(int x, int y, Color color){
-    // changer type Block pour avoir hitbox ? pour pouvoir utiliser collision et drawHitbox...
-    //int x = i / mapSizeY;
-    //int y = i % mapSizeY;
-    DrawLine(x*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio+1, (x+1)*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio+1, color);
-    DrawLine(x*blockSize*sizeCoef*screenRatio+1, (y+1)*blockSize*sizeCoef*screenRatio, (x+1)*blockSize*sizeCoef*screenRatio, (y+1)*blockSize*sizeCoef*screenRatio, color);
-    DrawLine(x*blockSize*sizeCoef*screenRatio+1, y*blockSize*sizeCoef*screenRatio+1, x*blockSize*sizeCoef*screenRatio+1, (y+1)*blockSize*sizeCoef*screenRatio, color);
-    DrawLine((x+1)*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio+1, (x+1)*blockSize*sizeCoef*screenRatio, (y+1)*blockSize*sizeCoef*screenRatio, color);
+void drawBlockHitbox(int x, int y, Block block, Color color){
+    float px = x * blockSize * sizeCoef * screenRatio;
+    float py = y * blockSize * sizeCoef * screenRatio;
+    float pw = block.texture.width * sizeCoef * screenRatio;
+    float ph = block.texture.height * sizeCoef * screenRatio;
+
+    DrawRectangleLinesEx((Rectangle){ px, py, pw, ph }, 1.0f, color);
 }
 
 void drawMap(int map[], Block blockID[]){
@@ -35,7 +34,7 @@ void drawMap(int map[], Block blockID[]){
                 i = x*mapSizeY + y;
                 if (blockID[map[i]].solid){ // if solid && showBlockHitbox (càd pas de l'air ou de l'eau)
                     drawBlock(x, y, blockID[map[i]]);
-                    drawBlockHitbox(x, y, BLACK);
+                    drawBlockHitbox(x, y, blockID[map[i]], BLACK);
                 }
             }
         }

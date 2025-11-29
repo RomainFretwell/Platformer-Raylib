@@ -129,7 +129,7 @@ void indexToHitbox(int index, Hitbox *hitbox){
     //rectToPoints(&(*hitbox)); // à changer
 }
 
-void handleCollisions(Entity ent, int map[], Camera2D camera){ // enlever camera quand fini de test
+void handleCollisions(Entity ent, int map[], Camera2D camera, Block block){ // enlever camera quand fini de test
     Hitbox blockHitbox;
     int n;
     int centerBlock = findBlockMap(ent, mapSizeX, mapSizeY);
@@ -140,19 +140,17 @@ void handleCollisions(Entity ent, int map[], Camera2D camera){ // enlever camera
                 indexToHitbox(n, &blockHitbox);
                 //drawHitbox(blockHitbox, BLUE);
                 rectToPoints(&blockHitbox);
-                if (checkCollisionHitboxes(ent.hitbox, blockHitbox)){ // remplacer par while
-                    Vector2 blockPos = (Vector2){n/mapSizeY, n%mapSizeY};//GetWorldToScreen2D(, camera);
-                    drawBlockHitbox(blockPos.x, blockPos.y, BLUE); //drawBlockHitbox(n, BLUE);
+                if (checkCollisionHitboxes(ent.hitbox, blockHitbox)){ // remplacer par while ensuite
+                    // Convertir l'index n en coordonnées de grille (x et y en nombre de blocks)
+                    int blockX = n / mapSizeY;
+                    int blockY = n % mapSizeY;
+                    
+                    drawBlockHitbox(blockX, blockY, block, BLUE);
                     // pas sensé draw car pas entre BeginDrawing et EndDrawing
-                    const char * test1 = TextFormat("World position X = %f", blockPos.x);
+                    const char * test1 = TextFormat("Block grid X = %d", blockX);
                     DrawText(test1, 310, 50, 20, BLACK);
-                    const char * test2 = TextFormat("World position Y = %f", blockPos.y);
+                    const char * test2 = TextFormat("Block grid Y = %d", blockY);
                     DrawText(test2, 310, 70, 20, BLACK);
-                    Vector2 testScreen = GetWorldToScreen2D(blockPos, camera);
-                    const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
-                    DrawText(test01, 310, 90, 20, BLACK);
-                    const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
-                    DrawText(test02, 310, 110, 20, BLACK);
 
 
 
@@ -533,8 +531,6 @@ int main(){
         updateHitboxEntity(&bow);
         updateHitboxEntity(&arrow);
 
-        handleCollisions(player, map, camera);
-
 
 // ----------------------------------------------------------------------------------------
 //                                   Drawing
@@ -607,7 +603,8 @@ int main(){
             drawHitbox(bow.hitbox, YELLOW);
         }
 
-        // handleCollisions(player, map, camera);
+        // Afficher les hitboxes de collision avec les blocs
+        handleCollisions(player, map, camera, dirt);
 
         // test croix player
         if (IsKeyDown(KEY_C)){
