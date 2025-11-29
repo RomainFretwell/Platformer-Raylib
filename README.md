@@ -1,5 +1,7 @@
 # Platformer-Raylib
 
+enlever rotation joueur et faire une fonction collision AABB
+
 Problème collision (marche pas si forme de pensement en croix)
 -> Pas vraiment un problème vu que il faut d'abord traverser l'objet (et donc avoir une collision) pour être dans cette position
 Vrai solution = algorythme SAT
