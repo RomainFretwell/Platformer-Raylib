@@ -1,0 +1,730 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "raylib.h"
+#include "structures.h"
+#include "constants.h"
+#include "draw.h"
+#include "math2.h"
+
+// ----------------------------------------------------------------------------------------
+//                                   Game functions
+// ----------------------------------------------------------------------------------------
+
+void ToggleFullscreenWindow(){
+    if (!IsWindowFullscreen()){
+        SetWindowSize(fullScreenSize.width, fullScreenSize.height);
+        ToggleFullscreen();
+        currentScreenSize.width = fullScreenSize.width;
+        currentScreenSize.height = fullScreenSize.height;
+    } else {
+        ToggleFullscreen();
+        SetWindowSize(smallScreenSize.width, smallScreenSize.height);
+        currentScreenSize.width = smallScreenSize.width;
+        currentScreenSize.height = smallScreenSize.height;
+        // TODO : set window position to a fix point
+    }
+    screenRatio = currentScreenSize.width / smallScreenSize.width;
+}
+
+void clearMap(int map[], int width, int height){
+    for (int x = 0; x < width; x++){
+        for (int y = 0; y < height; y++){
+            map[x*height + y] = 0;
+        }
+    }
+}
+
+void initializeMap(int map[], int width, int height){
+    for (int x = 0; x < width; x++){
+        for (int y = 0; y < height; y++){
+            map[x*height + y] = 0; // changer pour copier ou upload tableau d'un autre fichier (faire un dossier map)
+        }
+    }
+
+    // map de test en attendant ...
+    for (int x = 0; x < width; x++){
+        map[x*height + height - 1] = 1;
+        map[x*height + height - 2] = 2;
+    }
+    for (int x = 20; x < width; x++){
+        map[x*height + height - 3] = 4;
+    }
+    for (int x = 25; x < width; x+=3){
+        map[x*height + height - 4] = 3;
+    }
+    for (int x = 0; x < width; x++){
+        map[x*height] = 1;
+        map[x*height + 1] = 4;
+    }
+}
+
+// collisions
+
+bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2){
+    if (CheckCollisionPointTriangle(A1, A2, B2, C2)) return true;
+    if (CheckCollisionPointTriangle(B1, A2, B2, C2)) return true;
+    if (CheckCollisionPointTriangle(C1, A2, B2, C2)) return true;
+    if (CheckCollisionPointTriangle(A2, A1, B1, C1)) return true;
+    if (CheckCollisionPointTriangle(B2, A1, B1, C1)) return true;
+    if (CheckCollisionPointTriangle(C2, A1, B1, C1)) return true;
+    return false;
+}
+
+/* utile ? pê...
+void pointsToRect(Hitbox hitbox){
+    // TODO
+}
+*/
+
+void rectToPoints(Hitbox *hitbox){
+    hitbox->A = (Vector2) {hitbox->x, hitbox->y};
+    hitbox->B = (Vector2) {hitbox->A.x + hitbox->width*cosf(hitbox->angle * PI/180), hitbox->A.y + hitbox->width*sinf(hitbox->angle * PI/180)};
+    hitbox->D = (Vector2) {hitbox->A.x - hitbox->height*sinf(hitbox->angle * PI/180), hitbox->A.y + hitbox->height*cosf(hitbox->angle * PI/180)};
+    hitbox->C = (Vector2) {hitbox->B.x + hitbox->D.x - hitbox->A.x, hitbox->B.y + hitbox->D.y - hitbox->A.y};
+}
+
+bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2){
+    if (checkCollisionTriangles(hitbox1.A, hitbox1.B, hitbox1.C, hitbox2.A , hitbox2.B , hitbox2.C)) return true;
+    if (checkCollisionTriangles(hitbox1.A, hitbox1.B, hitbox1.C, hitbox2.A , hitbox2.D , hitbox2.C)) return true;
+    if (checkCollisionTriangles(hitbox1.A, hitbox1.D, hitbox1.C, hitbox2.A , hitbox2.B , hitbox2.C)) return true;
+    if (checkCollisionTriangles(hitbox1.A, hitbox1.D, hitbox1.C, hitbox2.A , hitbox2.D , hitbox2.C)) return true;
+    return false;
+}
+
+void updateHitboxEntity(Entity *ent){
+    float angle = ent->angle*PI/180 + atanf((ent->texture.height - ent->hitbox.topOffset - ent->hitbox.bottomOffset) / (ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset));
+    float AB = ent->texture.height - ent->hitbox.bottomOffset - ent->hitbox.topOffset;
+    float BC = ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset;
+    float radius = 0.5*sqrtf(AB*AB + BC*BC);
+
+    ent->hitbox.x = ent->position.x - radius*cosf(angle);
+    ent->hitbox.y = ent->position.y - radius*sinf(angle);
+    ent->hitbox.width = ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset;
+    ent->hitbox.height = ent->texture.height - ent->hitbox.topOffset - ent->hitbox.bottomOffset;
+    ent->hitbox.angle = ent->angle;
+    rectToPoints(&(ent->hitbox));
+}
+
+void updateHitboxItem(Item *item){ // ajouter décalage en parametre
+    item->hitbox.x = item->position.x; // à modifier ?
+    item->hitbox.y = item->position.y; // à modifier ?
+    item->hitbox.width = item->texture.width; // à enlever ?
+    item->hitbox.height = item->texture.height; // à enlever ?
+    item->hitbox.angle = item->angle;
+    rectToPoints(&(item->hitbox));
+}
+
+int findBlockMap(Entity ent, int mapSizeX, int mapSizeY){
+    int x = (int) ent.position.x / blockSize;
+    int y = (int) ent.position.y / blockSize;
+    return x%mapSizeX * mapSizeY + y%mapSizeY; // % mapSizeX  ?
+}
+
+void indexToHitbox(int index, Hitbox *hitbox){
+    hitbox->x = blockSize * (index / mapSizeY);
+    hitbox->y = blockSize * (index % mapSizeY);
+    hitbox->width = blockSize;
+    hitbox->height = blockSize;
+    hitbox->angle = 0;
+    //rectToPoints(&(*hitbox)); // à changer
+}
+
+void handleCollisions(Entity ent, int map[], Camera2D camera){ // enlever camera quand fini de test
+    Hitbox blockHitbox;
+    int n;
+    int centerBlock = findBlockMap(ent, mapSizeX, mapSizeY);
+    for (int i = -1; i<2; i++){
+        for (int j = -1; j<2; j++){
+            n = centerBlock + mapSizeY*i + j;
+            if (map[n] != 0){ // 0 = air
+                indexToHitbox(n, &blockHitbox);
+                //drawHitbox(blockHitbox, BLUE);
+                rectToPoints(&blockHitbox);
+                if (checkCollisionHitboxes(ent.hitbox, blockHitbox)){ // remplacer par while
+                    Vector2 blockPos = (Vector2){n/mapSizeY, n%mapSizeY};//GetWorldToScreen2D(, camera);
+                    drawBlockHitbox(blockPos.x, blockPos.y, BLUE); //drawBlockHitbox(n, BLUE);
+                    // pas sensé draw car pas entre BeginDrawing et EndDrawing
+                    const char * test1 = TextFormat("World position X = %f", blockPos.x);
+                    DrawText(test1, 310, 50, 20, BLACK);
+                    const char * test2 = TextFormat("World position Y = %f", blockPos.y);
+                    DrawText(test2, 310, 70, 20, BLACK);
+                    Vector2 testScreen = GetWorldToScreen2D(blockPos, camera);
+                    const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
+                    DrawText(test01, 310, 90, 20, BLACK);
+                    const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
+                    DrawText(test02, 310, 110, 20, BLACK);
+
+
+
+                    // décaler position de 1 dans la bonne direction (selon vitesse ?)
+			    }
+		    }
+        }
+    }
+}
+
+int canJump(Entity ent){
+    return (ent.position.y >= currentScreenSize.height-(2*blockSize*sizeCoef + ent.texture.height)*screenRatio);
+}
+// remplacer par colision // && cooldown(variable, jumpCooldown)
+// reset timer cooldown
+
+
+
+
+
+// ----------------------------------------------------------------------------------------
+//
+//                                   Main function
+//
+// ----------------------------------------------------------------------------------------
+
+int main(){
+    
+    // Window initialization
+    InitWindow(smallScreenSize.width, smallScreenSize.height, "jeu 2D avec Raylib");
+    fullScreenSize.width = GetMonitorWidth(GetCurrentMonitor());
+    fullScreenSize.height = GetMonitorHeight(GetCurrentMonitor());
+    currentScreenSize = smallScreenSize;
+    screenRatio = 1.0;
+    
+    // Load block textures
+    Block air;
+    air.texture = LoadTexture("resources/air.png"); // transparent texture
+    air.solid = false;
+    air.breakable = false;
+    air.coefRebond = 0.0;
+    Block dirt;
+    dirt.texture = LoadTexture("resources/dirt.png");
+    dirt.solid = true;
+    dirt.breakable = true;
+    dirt.coefRebond = 0.0;
+    Block grass;
+    grass.texture = LoadTexture("resources/grass.png");
+    grass.solid = true;
+    grass.breakable = true;
+    grass.coefRebond = 0.0;
+    Block stone;
+    stone.texture = LoadTexture("resources/stone.png");
+    stone.solid = true;
+    stone.breakable = true;
+    stone.coefRebond = 0.0;
+    Block gravel;
+    gravel.texture = LoadTexture("resources/gravel.png");
+    gravel.solid = true;
+    gravel.breakable = true;
+    gravel.coefRebond = 0.0;
+
+    Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
+
+    // Map initialization
+    mapSizeX = 64;
+    mapSizeY = 36;
+    int map[mapSizeX * mapSizeY];
+    clearMap(map, mapSizeX, mapSizeY);
+    initializeMap(map, mapSizeX, mapSizeY);
+    
+    Color background_color = {220, 230, 255, 255};
+
+    float gravity = 0.3;
+
+    // player initialization
+    Entity player;
+    player.position = (Vector2){300, 300};
+    player.VxMax = 5.0;
+    player.VyMax = 10.0;
+    player.velocity = (Vector2){0, 0};
+    player.acceleration = (Vector2){0.0, gravity};
+    float acceleration_ground = 0.1;
+    player.angle = 0;
+    player.direction = 1;
+    player.texture = LoadTexture("resources/druid.png");
+    player.hitbox.bottomOffset = 2;
+    player.hitbox.topOffset = 6;
+    player.hitbox.leftOffset = 8;
+    player.hitbox.rightOffset = 4;
+    
+    updateHitboxEntity(&player);
+    
+    // bow
+    Entity bow;
+    bow.texture = LoadTexture("resources/bow.png");
+    bow.hitbox.bottomOffset = 0;
+    bow.hitbox.topOffset = 0;
+    bow.hitbox.leftOffset = 0;
+    bow.hitbox.rightOffset = 0;
+    bow.position = (Vector2){(currentScreenSize.width-bow.texture.width)/2, (currentScreenSize.height-bow.texture.height)/2};
+    bow.velocity = player.velocity;
+    bow.acceleration = player.acceleration;
+    bow.angle = 135;
+    bow.direction = 1;
+    updateHitboxEntity(&bow);
+
+    Entity arrow;
+    arrow.position =  bow.position; // à changer à player.position
+    arrow.velocity = player.velocity;
+    arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
+    int fireSpeed = 10;
+    arrow.VabsMax = 50.0;
+    arrow.angle = 0;
+    arrow.direction = 1;
+    arrow.grabbed = true;
+    arrow.texture = LoadTexture("resources/arrow.png");
+    arrow.hitbox.bottomOffset = 0;
+    arrow.hitbox.topOffset = 0;
+    arrow.hitbox.leftOffset = 0;
+    arrow.hitbox.rightOffset = 0;
+    updateHitboxEntity(&arrow);
+    
+    // other variables
+    float jumpCooldown = 1;
+    float coefRebond = 0.1; // 0 = pas de rebond, 1 = rebond parfait
+    float testAngleArc = 1;
+
+    // camera
+    Camera2D camera = {
+        .offset = (Vector2){0,0},
+        .target = (Vector2){0,0},
+        .rotation = 0,
+        .zoom = 1
+    };
+    
+    // time variables
+    double frameStart;
+    double frameEnd;
+    double deltaTime = 0.01;
+    int size = 1;
+
+    float constanteFPS = 80.0; // 80.0
+    int maxFPS = 200;
+    SetTargetFPS(maxFPS);
+
+
+// ----------------------------------------------------------------------------------------
+//                                   Game loop
+// ----------------------------------------------------------------------------------------
+
+    while (!WindowShouldClose()){
+        
+        frameStart = GetTime();
+        
+        // Toggle fullscreen
+        if (IsKeyPressed(KEY_F11)) ToggleFullscreenWindow();
+                
+
+        if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.velocity.x < player.VxMax){
+            player.velocity.x += acceleration_ground;
+            player.direction = 1;
+        }
+        else if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && player.velocity.x > -player.VxMax){
+            player.velocity.x -= acceleration_ground;
+            player.direction = -1;
+        }
+        // ralentissement friction sol
+        else if (!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT)){
+            if (player.velocity.x > 0){
+                player.velocity.x -= acceleration_ground;
+                if (player.velocity.x < 0) player.velocity.x = 0.0;
+            }
+            if (player.velocity.x < 0){
+                player.velocity.x += acceleration_ground;
+                if (player.velocity.x > 0) player.velocity.x = 0.0;
+            }
+            if (-0.1 < player.velocity.x && player.velocity.x < 0.1){
+                player.velocity.x = 0.0;
+                player.acceleration.x = 0.0;
+            }
+        }
+
+        if (IsKeyDown(KEY_SPACE)){
+            player.position.y = 0;
+            player.velocity.y = 0;
+            player.acceleration.y = gravity;
+        }
+        
+        // test haut / bas
+        if (IsKeyDown(KEY_UP)){
+            player.velocity.y = -5.0;
+        }
+        else if (IsKeyDown(KEY_DOWN)){
+            player.velocity.y = 5.0;
+        }
+        else {
+            player.velocity.y = 0.0;
+        }
+
+        /* jump + gravitée + collision sol
+        // player jump
+        if (IsKeyDown(KEY_UP) && canJump(player)){
+            player.velocity.y = - 2 * player.VyMax;
+            player.acceleration.y = gravity;
+            // jumpCooldown = 1;
+        }
+
+        // gravité player
+        player.velocity.y += player.acceleration.y * GetFrameTime() * constanteFPS;
+        // limite vitesse player
+        if (player.velocity.x > player.VxMax) player.velocity.x = player.VxMax;
+        if (player.velocity.y > player.VyMax) player.velocity.y = player.VyMax;
+        if (player.velocity.x < -player.VxMax) player.velocity.x = -player.VxMax;
+        if (player.velocity.y < -player.VyMax) player.velocity.y = -player.VyMax;
+
+        // Rebond
+        if (player.position.y * screenRatio >= currentScreenSize.height-(2*blockSize*sizeCoef + player.texture.height)*screenRatio){
+            player.position.y = currentScreenSize.height / screenRatio - (2*blockSize*sizeCoef + player.texture.height);
+            if (player.velocity.y <= 2.){
+                player.velocity.y = 0;
+                player.acceleration.y = 0;
+            }
+            else if (jumpCooldown == 1){
+                player.velocity.y *= -coefRebond;
+                player.acceleration.y = gravity;
+            }
+        }
+        jumpCooldown -= 0.1 * GetFrameTime() * 200;
+
+        */
+        
+        player.position.x += player.velocity.x * screenRatio * GetFrameTime() * constanteFPS;
+        player.position.y += player.velocity.y * screenRatio * GetFrameTime() * constanteFPS;
+
+        float totalSpeed = distance(player.velocity, (Vector2){0, 0});
+        
+        // player angle
+        if (player.velocity.x == 0){
+            if (player.velocity.y < 0){
+                player.angle = 90;
+            }
+            else if (player.velocity.y > 0){
+                player.angle = -90;
+            }
+            else {
+                player.angle = 0;
+            }
+        }
+        else {
+            player.angle = (int) (atan(player.velocity.y / player.velocity.x) * 180/PI);
+        }
+
+        // limites angles
+        if (player.angle > 60) player.angle = 60;
+        if (player.angle < -60) player.angle = -60;
+        
+        if (IsKeyPressed(KEY_H)){
+            showBlockHitbox = !showBlockHitbox;
+            showEntityHitbox = !showEntityHitbox;
+        }
+
+        // test direction
+        if (IsKeyPressed(KEY_R)){
+            player.direction *= -1;
+        }
+        
+
+// ----------------------------------------------------------------------------------------
+//                                   Arrow
+// ----------------------------------------------------------------------------------------
+
+        // test arc et flèche qui tourne
+        /*if (bow.angle >= 135+90 || bow.angle <= 45-180){
+            testAngleArc *= -1;
+        }*/
+        testAngleArc = 0.1;
+        bow.angle = bow.angle + testAngleArc;
+        
+        // grab arrow
+        // TODO : changer distance arrow-player (pas arrow-arrow pour test)
+        if (IsKeyPressed(KEY_E) && distance(arrow.position, arrow.position) < 50){
+            arrow.grabbed = !arrow.grabbed;
+
+            arrow.position = bow.position; // à modifier car décalage
+            arrow.angle = bow.angle - 135;
+            arrow.acceleration.x = 0;
+            arrow.acceleration.y = gravity;
+            arrow.velocity = bow.velocity;
+        }
+
+        if (arrow.grabbed){
+            if (IsKeyPressed(KEY_Q)){ // clavier en qwerty ????
+                arrow.grabbed = false;
+
+                arrow.position = bow.position; // à modifier car décalage
+                arrow.angle = bow.angle - 135;
+                arrow.acceleration.x = 0;
+                arrow.acceleration.y = gravity;
+                arrow.velocity.x = fireSpeed * cosf(arrow.angle * PI/180) / screenRatio;
+                arrow.velocity.y = fireSpeed * sinf(arrow.angle * PI/180) / screenRatio;
+            }
+            else {
+                arrow.acceleration = bow.acceleration;
+                arrow.velocity = bow.velocity;
+                arrow.position = bow.position; // à modifier car décalage
+                arrow.angle = bow.angle - 135;
+            }
+        }
+
+        else {          
+            
+            // gravité flèche
+            arrow.velocity.y += arrow.acceleration.y * GetFrameTime() * constanteFPS;
+        
+            // limite vitesse flèche
+            if (distance(arrow.velocity, (Vector2) {0.0, 0.0}) > arrow.VabsMax) {
+                arrow.velocity.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
+                arrow.velocity.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
+            }
+            
+            // si collion avec block alors velocity = 0 et acceleration = 0
+
+            arrow.position.x += arrow.velocity.x * screenRatio * GetFrameTime() * constanteFPS;
+            arrow.position.y += arrow.velocity.y * screenRatio * GetFrameTime() * constanteFPS;
+
+            // arrow angle
+            if (arrow.velocity.x != 0 || arrow.velocity.y != 0){
+                if (arrow.velocity.y == 0){
+                    arrow.angle = 180 * (1-signe(arrow.velocity.x))/2;
+                }
+                if (arrow.velocity.x == 0){
+                    arrow.angle = 90 * signe(arrow.velocity.y);
+                }
+                else {
+                    if (arrow.velocity.x > 0){
+                        arrow.angle = (int) (atan(arrow.velocity.y / arrow.velocity.x) * 180/PI);
+                    }
+                    else {
+                        arrow.angle = 180 + (int) (atan(arrow.velocity.y / arrow.velocity.x) * 180/PI);
+                    }
+                }
+            }
+
+            // debut collision
+
+            // simplifié
+            // (arrow.position.y + arrow.texture.width*sinf(arrow.angle*PI/180)*180/PI)
+
+            // réel
+            // arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})*sinf((arrow.angle + atan(arrow.texture.height/arrow.texture.width/2)
+            if ((arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})) >= currentScreenSize.height/screenRatio - 30){
+                // arrow.position.y = currentScreenSize.height/screenRatio - 30;
+                arrow.velocity.x = 0.0;
+                arrow.velocity.y = 0.0;
+                arrow.acceleration.x = 0.0;
+                arrow.acceleration.y = 0.0;
+            }
+        }
+        
+// ----------------------------------------------------------------------------------------
+//                             Collision handleing
+// ----------------------------------------------------------------------------------------
+
+        
+
+        if (IsKeyDown(KEY_B)){
+            player.angle += 45;
+        }
+        if (IsKeyDown(KEY_N)){
+            player.angle += 90;
+        }
+        if (IsKeyDown(KEY_K)){
+            player.angle += 180;
+        }
+
+        updateHitboxEntity(&player);
+        updateHitboxEntity(&bow);
+        updateHitboxEntity(&arrow);
+
+        handleCollisions(player, map, camera);
+
+
+// ----------------------------------------------------------------------------------------
+//                                   Drawing
+// ----------------------------------------------------------------------------------------
+        BeginDrawing();
+        ClearBackground(background_color);
+        
+        camera.target.x = player.position.x * screenRatio;
+        camera.target.y = player.position.y * screenRatio;
+        
+        camera.offset.x = currentScreenSize.width/2;
+        camera.offset.y = currentScreenSize.height/2;
+        
+        if (IsKeyPressed(KEY_P)){
+            camera.zoom += 0.1;
+        }
+        if (IsKeyPressed(KEY_O)){
+            camera.zoom -= 0.1;
+        }
+        
+        BeginMode2D(camera);
+
+        drawMap(map, blockID);
+        /* test affichage map dans le terminal
+        if (IsKeyPressed(KEY_T)){
+            printf("\nmap =\n");
+            for (int j = 0; j<mapSizeY; j++){
+                for (int i = 0; i<mapSizeX; i++){
+                    printf("%d", map[i*mapSizeY+j]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
+        */
+        
+        
+        
+        // affichage des entity dans le bon ordre
+        drawEntity(player);
+        drawEntity(bow);
+        drawEntity(arrow);
+        
+        /* drawTexturePro bow et arrow
+        size = 1;
+        DrawTexturePro(bow.texture,
+                        (Rectangle) {0, 0, bow.texture.width, bow.texture.height}, // source
+                        (Rectangle) {(bow.position.x + bow.texture.width/2)*screenRatio,
+                                    (bow.position.y + bow.texture.height/2)*screenRatio,
+                                    size*bow.texture.width*screenRatio,
+                                    size*bow.texture.height*screenRatio}, // dest
+                        (Vector2) {bow.texture.width * size * screenRatio / 2, bow.texture.height * size * screenRatio /2}, // origin
+                        bow.angle, WHITE); // angle
+        
+        // arrow drawing
+        DrawTexturePro(arrow.texture,
+                        (Rectangle) {0, 0, arrow.texture.width, arrow.texture.height}, // source
+                        (Rectangle) {(arrow.position.x + bow.texture.width/2)*screenRatio,
+                                    (arrow.position.y + bow.texture.height/2)*screenRatio,
+                                    size*arrow.texture.width*screenRatio,
+                                    size*arrow.texture.height*screenRatio}, // dest
+                        (Vector2) {arrow.texture.width * size * screenRatio / 2, arrow.texture.height * size * screenRatio / 2}, // origin aka le centre de l'image
+                                    // dest.width/2, dest.height/2
+                        arrow.angle, WHITE); // angle
+        */
+        
+        if (showEntityHitbox){
+            drawHitbox(player.hitbox, RED);
+            drawHitbox(arrow.hitbox, ORANGE);
+            drawHitbox(bow.hitbox, YELLOW);
+        }
+
+        // handleCollisions(player, map, camera);
+
+        // test croix player
+        if (IsKeyDown(KEY_C)){
+            drawCross((int) player.position.x, (int) player.position.y, BLACK);
+        }
+
+        // debug info
+        EndMode2D();
+
+        if (showEntityHitbox){
+            const char * test0 = TextFormat("entity hitbox ON");
+            DrawText(test0, currentScreenSize.width - 180, 10, 20, RED);
+        }
+
+        DrawFPS(10, 10);
+        const char * test = TextFormat("Frame time = %f", GetFrameTime());
+        DrawText(test, 10, 30, 20, BLACK);
+        
+        
+        // test player
+        const char * test1 = TextFormat("World position X = %f", player.position.x);
+        DrawText(test1, 10, 50, 20, BLACK);
+        const char * test2 = TextFormat("World position Y = %f", player.position.y);
+        DrawText(test2, 10, 70, 20, BLACK);
+        Vector2 testScreen = GetWorldToScreen2D(player.position, camera);
+        const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
+        DrawText(test01, 10, 90, 20, BLACK);
+        const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
+        DrawText(test02, 10, 110, 20, BLACK);
+        /*const char * test3 = TextFormat("Velocity X = %f", player.velocity.x);
+        DrawText(test3, 10, 50, 20, BLACK);
+        const char * test4 = TextFormat("Velocity Y = %f", player.velocity.y);
+        DrawText(test4, 10, 70, 20, BLACK);
+        */
+
+        /* test arrow
+        // test arrow
+        const char * test8 = TextFormat("Arrow velocity X = %f", arrow.velocity.x);
+        DrawText(test8, 500, 50, 20, BLACK);
+        const char * test9 = TextFormat("Arrow velocity Y = %f", arrow.velocity.y);
+        DrawText(test9, 500, 70, 20, BLACK);
+        const char * test10 = TextFormat("Arrow position X = %f", arrow.position.x);
+        DrawText(test10, 500, 90, 20, BLACK);
+        const char * test11 = TextFormat("Arrow position Y = %f", arrow.position.y);
+        DrawText(test11, 500, 110, 20, BLACK);
+        const char * test12 = TextFormat("Arrow angle = %d", arrow.angle);
+        DrawText(test12, 500, 130, 20, BLACK);
+        const char * test15 = TextFormat("Bow velocity Y = %f", bow.velocity.y);
+        DrawText(test15, 500, 150, 20, BLACK);
+        */
+        
+        /* test collisions triangles
+        // test collision de 2 triangles
+        Vector2 A1 = GetMousePosition();
+        Vector2 B1 = {A1.x + 50, A1.y};
+        Vector2 C1 = {A1.x + 25, A1.y - 50};
+        Vector2 A2 = (Vector2){320, 180};
+        Vector2 B2 = (Vector2){370, 180};
+        Vector2 C2 = (Vector2){345, 130};
+        bool testCollision = checkCollisionTriangles(A1, B1, C1, A2, B2, C2);
+        const char * test13 = TextFormat("Collision triangles ? %s", testCollision?"OUI":"NON");
+        DrawText(test13, 30, 150, 20, BLACK);
+        DrawTriangle(A1, B1, C1, RED);
+        DrawTriangle(A2, B2, C2, BLUE);
+        */
+        
+        /* test collision de 2 hitbox
+        Hitbox hit1;
+        hit1.x = GetMousePosition().x / screenRatio;
+        hit1.y = GetMousePosition().y / screenRatio;
+        hit1.width = 50;
+        hit1.height = 20;
+        hit1.angle = 30;
+        hit1.A = (Vector2) {400, 200};
+        hit1.B = (Vector2) {450, 200};
+        hit1.C = (Vector2) {450, 220};
+        hit1.D = (Vector2) {400, 220};
+        rectToPoints(&hit1);
+        drawHitbox(hit1, RED);
+        Hitbox hit2;
+        hit2.x = 700 / screenRatio;
+        hit2.y = 300 / screenRatio;
+        hit2.width = 80;
+        hit2.height = 15;
+        hit2.angle = bow.angle;
+        hit2.A = (Vector2) {400, 200};
+        hit2.B = (Vector2) {450, 200};
+        hit2.C = (Vector2) {450, 220};
+        hit2.D = (Vector2) {400, 220};
+        rectToPoints(&hit2);
+        drawHitbox(hit2, BLUE);
+        
+        
+        bool testCollisionHitbox = checkCollisionHitboxes(hit1, hit2);
+        const char * test14 = TextFormat("Collision hitbox ? %s", testCollisionHitbox?"OUI":"NON");
+        DrawText(test14, 30, 180, 20, BLACK);
+        */
+        
+        
+        EndDrawing();
+
+        frameEnd = GetTime();
+        deltaTime = frameEnd - frameStart;
+    }
+    
+    UnloadTexture(air.texture);
+    UnloadTexture(dirt.texture);
+    UnloadTexture(grass.texture);
+    UnloadTexture(stone.texture);
+    UnloadTexture(gravel.texture);
+    UnloadTexture(player.texture);
+    UnloadTexture(bow.texture);
+    UnloadTexture(arrow.texture);
+
+    CloseWindow();
+
+    // sauvegarde
+
+    return 0;
+}
