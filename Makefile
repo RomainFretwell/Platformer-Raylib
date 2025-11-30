@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -O2
 LDFLAGS := -lraylib -lm
-SOURCES := main.c constants.c draw.c math2.c
+SOURCES := main.c constants.c draw.c math2.c camera.c
 TARGET := game
 
 all: $(TARGET)
