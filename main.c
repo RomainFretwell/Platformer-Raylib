@@ -196,10 +196,32 @@ void limitCameraMap(Camera2D * camera){
         camera->target.y = camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.height;
     }
 }
+
+void cameraFollow(Camera2D * camera, Entity player){
+    float cameraAcceleration = 0.04;
+    camera->target.x += cameraAcceleration * (player.position.x*screenRatio - camera->target.x);
+    camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
+}
+
+void limitCameraFollow(Camera2D * camera, Entity player){
+    int cameraFollowThresh = 120;
+    if ((player.position.x - cameraFollowThresh) * screenRatio > camera->target.x){
+        camera->target.x = (player.position.x - cameraFollowThresh) * screenRatio;
+    }
+    if ((player.position.x + cameraFollowThresh) * screenRatio < camera->target.x){
+        camera->target.x = (player.position.x + cameraFollowThresh) * screenRatio;
+    }
+    if ((player.position.y - cameraFollowThresh) * screenRatio > camera->target.y){
+        camera->target.y = (player.position.y - cameraFollowThresh) * screenRatio;
+    }
+    if ((player.position.y + cameraFollowThresh) * screenRatio < camera->target.y){
+        camera->target.y = (player.position.y + cameraFollowThresh) * screenRatio;
+    }
+}
+
+
 // remplacer par colision // && cooldown(variable, jumpCooldown)
 // reset timer cooldown
-
-
 
 
 
@@ -536,10 +558,8 @@ int main(){
 //                                   Drawing
 // ----------------------------------------------------------------------------------------
         BeginDrawing();
+        
         ClearBackground(background_color);
-        
-        
-        limitCameraMap(&camera);
         
 
         if (IsKeyPressed(KEY_P)){
@@ -549,25 +569,12 @@ int main(){
             camera.zoom -= 0.1;
         }
         
+        limitCameraMap(&camera);
+
         BeginMode2D(camera);
 
-
-        int cameraFollowThresh = 100;
-        
-        if ((player.position.x - cameraFollowThresh) * screenRatio > camera.target.x){
-            camera.target.x = (player.position.x - cameraFollowThresh) * screenRatio;
-        }
-        if ((player.position.x + cameraFollowThresh) * screenRatio < camera.target.x){
-            camera.target.x = (player.position.x + cameraFollowThresh) * screenRatio;
-        }
-        if ((player.position.y - cameraFollowThresh) * screenRatio > camera.target.y){
-            camera.target.y = (player.position.y - cameraFollowThresh) * screenRatio;
-        }
-        if ((player.position.y + cameraFollowThresh) * screenRatio < camera.target.y){
-            camera.target.y = (player.position.y + cameraFollowThresh) * screenRatio;
-        }
-
-        
+        cameraFollow(&camera, player);
+        limitCameraFollow(&camera, player);
 
         drawMap(map, blockID);
         /* test affichage map dans le terminal
