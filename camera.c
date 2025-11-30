@@ -41,3 +41,7 @@ void limitCameraFollow(Camera2D * camera, Entity player){
         camera->target.y = (player.position.y + cameraFollowThresh) * screenRatio;
     }
 }
+
+void shakeCamera(Camera2D * camera, float intensity, float duration){
+    // TODO
+}
