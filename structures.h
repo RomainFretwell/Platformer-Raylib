@@ -8,6 +8,13 @@ typedef struct structVector2int {
     int height;
 } Vector2int;
 
+typedef struct structIntRectangle {
+    int x;
+    int y;
+    int width;
+    int height;
+} IntRectangle;
+
 typedef struct structHitbox {
     float x;
     float y;

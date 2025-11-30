@@ -7,6 +7,15 @@
 #include "math2.h"
 #include "draw.h" // à enlever après ?
 
+bool rectangleCollision(IntRectangle a, IntRectangle b){
+    return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.width &&
+        a.y + a.width > b.y
+    );
+}
+
 bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2){
     if (CheckCollisionPointTriangle(A1, A2, B2, C2)) return true;
     if (CheckCollisionPointTriangle(B1, A2, B2, C2)) return true;
