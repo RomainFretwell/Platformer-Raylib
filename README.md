@@ -4,11 +4,11 @@ Objectif : faire un platformer dans un style 8 bit médiéval avec une option cr
 + trouver une mécanique de jeu unique
 
 ## TODO
-- améliorer caméra -> plus fluide
-- modifier structure map/world pour en avoir plusieurs mais de différentes tailles
-- enlever rotation joueur et faire une fonction collision AABB
+- faire .c et .h pour fonctions camera
+- faire une fonction collision AABB
 - finir handleCollision -> avec les bon décalage + utiliser while
-- séparer en différents .c et .h
+- modifier structure map/world pour en avoir plusieurs mais de différentes tailles
+
 
 ## Brouillon
 Problème collision (marche pas si forme de pensement en croix)
