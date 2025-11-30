@@ -82,19 +82,23 @@ void handleBlockCollisions(Entity * ent, int map[]){
                 indexToHitbox(n, &blockHitbox);
                 //drawHitbox(blockHitbox, BLUE);
                 rectToPoints(&blockHitbox);
-                int antiCrash = 0;
-                while (checkCollisionHitboxes(ent->hitbox, blockHitbox)){ // remplacer par while ensuite
-                    
-                    ent->position.x -= signe(ent->velocity.x);
-                    ent->position.y -= signe(ent->velocity.y);
-                    updateHitboxEntity(ent);
+                if (checkCollisionHitboxes(ent->hitbox, blockHitbox)){ // remplacer par while ensuite
+                    int antiCrash = 0;
+                    do {
+                        ent->position.x -= signe(ent->velocity.x);
+                        ent->position.y -= signe(ent->velocity.y);
+                        updateHitboxEntity(ent);
 
-                    antiCrash++;
-                    if (antiCrash > 1000){
-                        antiCrash = 0;
-                        printf("\nCRASH dans handleBlockCollision à cause de la boucle while\n");
-                        break;
-                    }
+                        antiCrash++;
+                        if (antiCrash > 1000){
+                            antiCrash = 0;
+                            printf("\nCRASH dans handleBlockCollision à cause de la boucle while\n");
+                            break;
+                        }
+                    } while (checkCollisionHitboxes(ent->hitbox, blockHitbox));
+
+                    ent->acceleration.x = 0;
+                    ent->velocity.x = 0;
 
                     //*
                     int blockX = n / mapSizeY;
