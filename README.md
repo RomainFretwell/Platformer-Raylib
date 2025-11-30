@@ -5,7 +5,7 @@ Objectif : faire un platformer dans un style 8 bit médiéval avec une option cr
 
 ## TODO
 - faire une fonction collision AABB
-- finir handleCollision -> avec les bon décalage + utiliser while
+- finir handleCollision -> attention boucle while
 - modifier structure map/world pour en avoir plusieurs mais de différentes tailles
 
 
