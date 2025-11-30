@@ -62,6 +62,15 @@ void initializeMap(int map[], int mapWidth, int mapHeight){
         map[y + (mapWidth-1)*mapHeight] = 1;
         map[y + (mapWidth-2)*mapHeight] = 1;
     }
+
+    for (int x = 20; x < 25; x++){
+        map[x*mapHeight + 20] = 4;
+        map[x*mapHeight + 24] = 4;
+    }
+    for (int y = 21; y < 24; y++){
+        map[20*mapHeight + y] = 4;
+        map[24*mapHeight + y] = 4;
+    }
 }
 
 // collisions
@@ -264,7 +273,6 @@ int main(){
     player.hitbox.topOffset = 6;
     player.hitbox.leftOffset = 8;
     player.hitbox.rightOffset = 4;
-    
     updateHitboxEntity(&player);
     
     // bow
@@ -304,8 +312,8 @@ int main(){
 
     // camera
     Camera2D camera = {
-        .offset = (Vector2){0,0},
-        .target = (Vector2){0,0},
+        .target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio},
+        .offset = (Vector2){currentScreenSize.width/2, currentScreenSize.height/2},
         .rotation = 0,
         .zoom = 1
     };
@@ -330,7 +338,12 @@ int main(){
         frameStart = GetTime();
         
         // Toggle fullscreen
-        if (IsKeyPressed(KEY_F11)) ToggleFullscreenWindow();
+        if (IsKeyPressed(KEY_F11)){
+            ToggleFullscreenWindow();
+            camera.offset = (Vector2){currentScreenSize.width/2, currentScreenSize.height/2};
+            camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
+        }
+        
                 
 
         if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.velocity.x < player.VxMax){
@@ -406,39 +419,16 @@ int main(){
 
         */
         
-        player.position.x += player.velocity.x * screenRatio * GetFrameTime() * constanteFPS;
-        player.position.y += player.velocity.y * screenRatio * GetFrameTime() * constanteFPS;
+        player.position.x += player.velocity.x * GetFrameTime() * constanteFPS;
+        player.position.y += player.velocity.y * GetFrameTime() * constanteFPS;
 
         float totalSpeed = distance(player.velocity, (Vector2){0, 0});
         
-        // player angle
-        if (player.velocity.x == 0){
-            if (player.velocity.y < 0){
-                player.angle = 90;
-            }
-            else if (player.velocity.y > 0){
-                player.angle = -90;
-            }
-            else {
-                player.angle = 0;
-            }
-        }
-        else {
-            player.angle = (int) (atan(player.velocity.y / player.velocity.x) * 180/PI);
-        }
-
-        // limites angles
-        if (player.angle > 60) player.angle = 60;
-        if (player.angle < -60) player.angle = -60;
         
+
         if (IsKeyPressed(KEY_H)){
             showBlockHitbox = !showBlockHitbox;
             showEntityHitbox = !showEntityHitbox;
-        }
-
-        // test direction
-        if (IsKeyPressed(KEY_R)){
-            player.direction *= -1;
         }
         
 
@@ -447,9 +437,6 @@ int main(){
 // ----------------------------------------------------------------------------------------
 
         // test arc et flèche qui tourne
-        /*if (bow.angle >= 135+90 || bow.angle <= 45-180){
-            testAngleArc *= -1;
-        }*/
         testAngleArc = 0.1;
         bow.angle = bow.angle + testAngleArc;
         
@@ -538,18 +525,6 @@ int main(){
 //                             Collision handleing
 // ----------------------------------------------------------------------------------------
 
-        
-
-        if (IsKeyDown(KEY_B)){
-            player.angle += 45;
-        }
-        if (IsKeyDown(KEY_N)){
-            player.angle += 90;
-        }
-        if (IsKeyDown(KEY_K)){
-            player.angle += 180;
-        }
-
         updateHitboxEntity(&player);
         updateHitboxEntity(&bow);
         updateHitboxEntity(&arrow);
@@ -563,11 +538,6 @@ int main(){
         BeginDrawing();
         ClearBackground(background_color);
         
-        camera.target.x = player.position.x * screenRatio;
-        camera.target.y = player.position.y * screenRatio;
-
-        camera.offset.x = currentScreenSize.width/2;
-        camera.offset.y = currentScreenSize.height/2;
         
         limitCameraMap(&camera);
         
@@ -580,6 +550,24 @@ int main(){
         }
         
         BeginMode2D(camera);
+
+
+        int cameraFollowThresh = 100;
+        
+        if ((player.position.x - cameraFollowThresh) * screenRatio > camera.target.x){
+            camera.target.x = (player.position.x - cameraFollowThresh) * screenRatio;
+        }
+        if ((player.position.x + cameraFollowThresh) * screenRatio < camera.target.x){
+            camera.target.x = (player.position.x + cameraFollowThresh) * screenRatio;
+        }
+        if ((player.position.y - cameraFollowThresh) * screenRatio > camera.target.y){
+            camera.target.y = (player.position.y - cameraFollowThresh) * screenRatio;
+        }
+        if ((player.position.y + cameraFollowThresh) * screenRatio < camera.target.y){
+            camera.target.y = (player.position.y + cameraFollowThresh) * screenRatio;
+        }
+
+        
 
         drawMap(map, blockID);
         /* test affichage map dans le terminal
@@ -638,6 +626,11 @@ int main(){
 
         // debug info
         EndMode2D();
+
+
+// ----------------------------------------------------------------------------------------
+//                                   TESTS
+// ----------------------------------------------------------------------------------------
 
         if (showEntityHitbox){
             const char * test0 = TextFormat("entity hitbox ON");
