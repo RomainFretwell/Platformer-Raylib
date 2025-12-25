@@ -1,18 +1,21 @@
-CC := gcc
-CFLAGS := -Wall -Wextra -O2
-LDFLAGS := -lraylib -lm
-SOURCES := main.c constants.c draw.c math2.c camera.c collision.c
+SOURCES := $(wildcard *.c)
+HEAD := $(wildcard *.h)
 TARGET := game
+ZIPNAME := Platformer.zip
 
-all: $(TARGET)
+.PHONY: compile run clean cleanzip zip
 
-$(TARGET): $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) $(LDFLAGS) -o $(TARGET)
+compile: $(SOURCES) $(HEAD)
+	gcc $(SOURCES) -lraylib -lm -o $(TARGET) -Wall -Wextra -O2
 
-.PHONY: run clean
-
-run: $(TARGET)
+run:
 	./$(TARGET)
 
 clean:
 	rm -f $(TARGET)
+
+cleanzip:
+	rm -f $(ZIPNAME)
+
+zip:
+	zip -r $(ZIPNAME) . -x ".*" -x "$(ZIPNAME)" -x "$(TARGET)"
