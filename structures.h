@@ -35,7 +35,7 @@ typedef struct structHitbox {
 
 typedef struct structEntity {
     Vector2 position;
-    Vector2 velocity;
+    Vector2 speed;
     Vector2 acceleration;
     float VxMax;
     float VyMax;
@@ -56,7 +56,7 @@ typedef struct structBlock {
 
 typedef struct structItem {
     Vector2 position;
-    Vector2 velocity;
+    Vector2 speed;
     Vector2 acceleration;
     float angle;
     Texture2D texture;

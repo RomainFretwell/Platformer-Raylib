@@ -145,7 +145,7 @@ int main(){
     player.position = (Vector2){150, 200};
     player.VxMax = 5.0;
     player.VyMax = 10.0;
-    player.velocity = (Vector2){0, 0};
+    player.speed = (Vector2){0, 0};
     player.acceleration = (Vector2){0.0, gravity};
     float acceleration_ground = 0.1;
     player.angle = 0;
@@ -165,7 +165,7 @@ int main(){
     bow.hitbox.leftOffset = 0;
     bow.hitbox.rightOffset = 0;
     bow.position = (Vector2){(currentScreenSize.width-bow.texture.width)/2, (currentScreenSize.height-bow.texture.height)/2};
-    bow.velocity = player.velocity;
+    bow.speed = player.speed;
     bow.acceleration = player.acceleration;
     bow.angle = 135;
     bow.direction = 1;
@@ -173,7 +173,7 @@ int main(){
 
     Entity arrow;
     arrow.position =  bow.position; // à changer à player.position
-    arrow.velocity = player.velocity;
+    arrow.speed = player.speed;
     arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
     int fireSpeed = 10;
     arrow.VabsMax = 50.0;
@@ -226,72 +226,97 @@ int main(){
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
 
-        if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.velocity.x < player.VxMax){
-            player.velocity.x += acceleration_ground;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//      ##################   Mouvement   #######################
+
+        if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.speed.x < player.VxMax){
+            player.speed.x += acceleration_ground;
             player.direction = 1;
         }
-        else if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && player.velocity.x > -player.VxMax){
-            player.velocity.x -= acceleration_ground;
+        else if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && player.speed.x > -player.VxMax){
+            player.speed.x -= acceleration_ground;
             player.direction = -1;
         }
         // ralentissement friction sol
         else if (!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT)){
-            if (player.velocity.x > 0){
-                player.velocity.x -= acceleration_ground;
-                if (player.velocity.x < 0) player.velocity.x = 0.0;
+            if (player.speed.x > 0){
+                player.speed.x -= acceleration_ground;
+                if (player.speed.x < 0) player.speed.x = 0.0;
             }
-            if (player.velocity.x < 0){
-                player.velocity.x += acceleration_ground;
-                if (player.velocity.x > 0) player.velocity.x = 0.0;
+            if (player.speed.x < 0){
+                player.speed.x += acceleration_ground;
+                if (player.speed.x > 0) player.speed.x = 0.0;
             }
-            if (-0.1 < player.velocity.x && player.velocity.x < 0.1){
-                player.velocity.x = 0.0;
+            if (-0.1 < player.speed.x && player.speed.x < 0.1){
+                player.speed.x = 0.0;
                 player.acceleration.x = 0.0;
             }
         }
 
         if (IsKeyDown(KEY_SPACE)){
             player.position.y = 0;
-            player.velocity.y = 0;
+            player.speed.y = 0;
             player.acceleration.y = gravity;
         }
         
         // test haut / bas
         if (IsKeyDown(KEY_UP)){
-            player.velocity.y = -5.0;
+            player.speed.y = -5.0;
         }
         else if (IsKeyDown(KEY_DOWN)){
-            player.velocity.y = 5.0;
+            player.speed.y = 5.0;
         }
         else {
-            player.velocity.y = 0.0;
+            player.speed.y = 0.0;
         }
 
         /* jump + gravitée + collision sol
         // player jump
         if (IsKeyDown(KEY_UP) && canJump(player)){
-            player.velocity.y = - 2 * player.VyMax;
+            player.speed.y = - 2 * player.VyMax;
             player.acceleration.y = gravity;
             // jumpCooldown = 1;
         }
 
         // gravité player
-        player.velocity.y += player.acceleration.y * GetFrameTime() * constanteFPS;
+        player.speed.y += player.acceleration.y * GetFrameTime() * constanteFPS;
         // limite vitesse player
-        if (player.velocity.x > player.VxMax) player.velocity.x = player.VxMax;
-        if (player.velocity.y > player.VyMax) player.velocity.y = player.VyMax;
-        if (player.velocity.x < -player.VxMax) player.velocity.x = -player.VxMax;
-        if (player.velocity.y < -player.VyMax) player.velocity.y = -player.VyMax;
+        if (player.speed.x > player.VxMax) player.speed.x = player.VxMax;
+        if (player.speed.y > player.VyMax) player.speed.y = player.VyMax;
+        if (player.speed.x < -player.VxMax) player.speed.x = -player.VxMax;
+        if (player.speed.y < -player.VyMax) player.speed.y = -player.VyMax;
 
         // Rebond
         if (player.position.y * screenRatio >= currentScreenSize.height-(2*blockSize*sizeCoef + player.texture.height)*screenRatio){
             player.position.y = currentScreenSize.height / screenRatio - (2*blockSize*sizeCoef + player.texture.height);
-            if (player.velocity.y <= 2.){
-                player.velocity.y = 0;
+            if (player.speed.y <= 2.){
+                player.speed.y = 0;
                 player.acceleration.y = 0;
             }
             else if (jumpCooldown == 1){
-                player.velocity.y *= -coefRebond;
+                player.speed.y *= -coefRebond;
                 player.acceleration.y = gravity;
             }
         }
@@ -299,10 +324,10 @@ int main(){
 
         */
         
-        player.position.x += player.velocity.x * GetFrameTime() * constanteFPS;
-        player.position.y += player.velocity.y * GetFrameTime() * constanteFPS;
+        player.position.x += player.speed.x * GetFrameTime() * constanteFPS;
+        player.position.y += player.speed.y * GetFrameTime() * constanteFPS;
 
-        float totalSpeed = distance(player.velocity, (Vector2){0, 0});
+        float totalSpeed = distance(player.speed, (Vector2){0, 0});
         
         
 
@@ -329,7 +354,7 @@ int main(){
             arrow.angle = bow.angle - 135;
             arrow.acceleration.x = 0;
             arrow.acceleration.y = gravity;
-            arrow.velocity = bow.velocity;
+            arrow.speed = bow.speed;
         }
 
         if (arrow.grabbed){
@@ -340,12 +365,12 @@ int main(){
                 arrow.angle = bow.angle - 135;
                 arrow.acceleration.x = 0;
                 arrow.acceleration.y = gravity;
-                arrow.velocity.x = fireSpeed * cosf(arrow.angle * PI/180) / screenRatio;
-                arrow.velocity.y = fireSpeed * sinf(arrow.angle * PI/180) / screenRatio;
+                arrow.speed.x = fireSpeed * cosf(arrow.angle * PI/180) / screenRatio;
+                arrow.speed.y = fireSpeed * sinf(arrow.angle * PI/180) / screenRatio;
             }
             else {
                 arrow.acceleration = bow.acceleration;
-                arrow.velocity = bow.velocity;
+                arrow.speed = bow.speed;
                 arrow.position = bow.position; // à modifier car décalage
                 arrow.angle = bow.angle - 135;
             }
@@ -354,33 +379,33 @@ int main(){
         else {          
             
             // gravité flèche
-            arrow.velocity.y += arrow.acceleration.y * GetFrameTime() * constanteFPS;
+            arrow.speed.y += arrow.acceleration.y * GetFrameTime() * constanteFPS;
         
             // limite vitesse flèche
-            if (distance(arrow.velocity, (Vector2) {0.0, 0.0}) > arrow.VabsMax) {
-                arrow.velocity.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
-                arrow.velocity.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
+            if (distance(arrow.speed, (Vector2) {0.0, 0.0}) > arrow.VabsMax) {
+                arrow.speed.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
+                arrow.speed.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
             }
             
-            // si collion avec block alors velocity = 0 et acceleration = 0
+            // si collion avec block alors speed = 0 et acceleration = 0
 
-            arrow.position.x += arrow.velocity.x * screenRatio * GetFrameTime() * constanteFPS;
-            arrow.position.y += arrow.velocity.y * screenRatio * GetFrameTime() * constanteFPS;
+            arrow.position.x += arrow.speed.x * screenRatio * GetFrameTime() * constanteFPS;
+            arrow.position.y += arrow.speed.y * screenRatio * GetFrameTime() * constanteFPS;
 
             // arrow angle
-            if (arrow.velocity.x != 0 || arrow.velocity.y != 0){
-                if (arrow.velocity.y == 0){
-                    arrow.angle = 180 * (1-signe(arrow.velocity.x))/2;
+            if (arrow.speed.x != 0 || arrow.speed.y != 0){
+                if (arrow.speed.y == 0){
+                    arrow.angle = 180 * (1-signe(arrow.speed.x))/2;
                 }
-                if (arrow.velocity.x == 0){
-                    arrow.angle = 90 * signe(arrow.velocity.y);
+                if (arrow.speed.x == 0){
+                    arrow.angle = 90 * signe(arrow.speed.y);
                 }
                 else {
-                    if (arrow.velocity.x > 0){
-                        arrow.angle = (int) (atan(arrow.velocity.y / arrow.velocity.x) * 180/PI);
+                    if (arrow.speed.x > 0){
+                        arrow.angle = (int) (atan(arrow.speed.y / arrow.speed.x) * 180/PI);
                     }
                     else {
-                        arrow.angle = 180 + (int) (atan(arrow.velocity.y / arrow.velocity.x) * 180/PI);
+                        arrow.angle = 180 + (int) (atan(arrow.speed.y / arrow.speed.x) * 180/PI);
                     }
                 }
             }
@@ -394,8 +419,8 @@ int main(){
             // arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})*sinf((arrow.angle + atan(arrow.texture.height/arrow.texture.width/2)
             if ((arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})) >= currentScreenSize.height/screenRatio - 30){
                 // arrow.position.y = currentScreenSize.height/screenRatio - 30;
-                arrow.velocity.x = 0.0;
-                arrow.velocity.y = 0.0;
+                arrow.speed.x = 0.0;
+                arrow.speed.y = 0.0;
                 arrow.acceleration.x = 0.0;
                 arrow.acceleration.y = 0.0;
             }
@@ -517,17 +542,17 @@ int main(){
         DrawText(test01, 10, 90, 20, BLACK);
         const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
         DrawText(test02, 10, 110, 20, BLACK);
-        /*const char * test3 = TextFormat("Velocity X = %f", player.velocity.x);
+        /*const char * test3 = TextFormat("speed X = %f", player.speed.x);
         DrawText(test3, 10, 50, 20, BLACK);
-        const char * test4 = TextFormat("Velocity Y = %f", player.velocity.y);
+        const char * test4 = TextFormat("speed Y = %f", player.speed.y);
         DrawText(test4, 10, 70, 20, BLACK);
         */
 
         /* test arrow
         // test arrow
-        const char * test8 = TextFormat("Arrow velocity X = %f", arrow.velocity.x);
+        const char * test8 = TextFormat("Arrow speed X = %f", arrow.speed.x);
         DrawText(test8, 500, 50, 20, BLACK);
-        const char * test9 = TextFormat("Arrow velocity Y = %f", arrow.velocity.y);
+        const char * test9 = TextFormat("Arrow speed Y = %f", arrow.speed.y);
         DrawText(test9, 500, 70, 20, BLACK);
         const char * test10 = TextFormat("Arrow position X = %f", arrow.position.x);
         DrawText(test10, 500, 90, 20, BLACK);
@@ -535,7 +560,7 @@ int main(){
         DrawText(test11, 500, 110, 20, BLACK);
         const char * test12 = TextFormat("Arrow angle = %d", arrow.angle);
         DrawText(test12, 500, 130, 20, BLACK);
-        const char * test15 = TextFormat("Bow velocity Y = %f", bow.velocity.y);
+        const char * test15 = TextFormat("Bow speed Y = %f", bow.speed.y);
         DrawText(test15, 500, 150, 20, BLACK);
         */
         

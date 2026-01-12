@@ -87,8 +87,8 @@ void handleBlockCollisions(Entity * ent, int map[]){
                 if (checkCollisionHitboxes(ent->hitbox, blockHitbox)){ // remplacer par while ensuite
                     int antiCrash = 0;
                     do {
-                        ent->position.x -= signe(ent->velocity.x);
-                        ent->position.y -= signe(ent->velocity.y);
+                        ent->position.x -= signe(ent->speed.x);
+                        ent->position.y -= signe(ent->speed.y);
                         updateHitboxEntity(ent);
 
                         antiCrash++;
@@ -100,7 +100,7 @@ void handleBlockCollisions(Entity * ent, int map[]){
                     } while (checkCollisionHitboxes(ent->hitbox, blockHitbox));
 
                     ent->acceleration.x = 0;
-                    ent->velocity.x = 0;
+                    ent->speed.x = 0;
 
                     //*
                     int blockX = n / mapSizeY;
