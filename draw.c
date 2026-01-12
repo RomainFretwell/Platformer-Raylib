@@ -1,10 +1,4 @@
 #include "draw.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "raylib.h"
-#include "structures.h"
-#include "constants.h"
-
 
 void drawCross(int x, int y, Color color){
     DrawLine(0, y*screenRatio, currentScreenSize.width, y*screenRatio, color);

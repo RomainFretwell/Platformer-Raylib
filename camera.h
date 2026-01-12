@@ -1,7 +1,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "raylib.h"
 #include "structures.h"
+#include "constants.h"
 
 void limitCameraMap(Camera2D * camera);
 void cameraFollow(Camera2D * camera, Entity player);

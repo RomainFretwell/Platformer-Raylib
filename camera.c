@@ -1,9 +1,4 @@
 #include "camera.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "raylib.h"
-#include "structures.h"
-#include "constants.h"
 
 void limitCameraMap(Camera2D * camera){
     if (camera->target.x < camera->offset.x){
