@@ -225,8 +225,6 @@ int main(){
             camera.offset = (Vector2){currentScreenSize.width/2, currentScreenSize.height/2};
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
-        
-                
 
         if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.velocity.x < player.VxMax){
             player.velocity.x += acceleration_ground;
