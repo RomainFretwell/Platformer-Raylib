@@ -10,12 +10,23 @@ float signe(float x){
     else return 0.0f;
 }
 
+int signInt(int x){
+    return (x > 0)?1:-1;
+}
+
 float min(float a, float b){
     return (a<b)?a:b;
 }
 
 float max(float a, float b){
     return (a>b)?a:b;
+}
+
+int round(float x){
+    if (x >= 0.0f){
+        return (int) (x + 0.5f);
+    }
+    return (int) (x - 0.5f);
 }
 
 float approach(float current, float target, float increase){
