@@ -1,16 +1,12 @@
 # Platformer-Raylib
 
 Objectif : faire un platformer dans un style 8 bit médiéval avec une option création de niveau
-+ trouver une mécanique de jeu unique
+(trouver une mécanique de jeu unique)
 
 ## TODO
-- faire une fonction collision AABB
+- Modifier hitbox ou les fonctions hitbox pour avoir qlqch de joli
+- Nettoyer le main + mettre des trucs dans des .c et .h
 - finir handleCollision -> attention boucle while
 - modifier structure map/world pour en avoir plusieurs mais de différentes tailles
 
 
-## Brouillon
-Problème collision (marche pas si forme de pensement en croix)
--> Pas vraiment un problème vu que il faut d'abord traverser l'objet (et donc avoir une collision) pour être dans cette position
-Vrai solution = algorithme SAT
-Ma version des collisions devrait suffire et semble plus rapide
