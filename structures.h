@@ -3,10 +3,10 @@
 
 #include "raylib.h"
 
-typedef struct structVector2int {
-    int width;
-    int height;
-} Vector2int;
+typedef struct structIntVector2 {
+    int x;
+    int y;
+} IntVector2;
 
 typedef struct structIntRectangle {
     int x;
@@ -21,11 +21,13 @@ typedef struct structHitbox {
     float width;
     float height;
     float angle;
-    // hitbox offset
+    
+    // hitbox offset à modifier ?
     float bottomOffset;
     float topOffset;
     float leftOffset;
     float rightOffset;
+
     // autre representation d'un rectangle ABCD avec 4 points
     Vector2 A;
     Vector2 B;
@@ -37,14 +39,20 @@ typedef struct structEntity {
     Vector2 position;
     Vector2 speed;
     Vector2 acceleration;
+
+    // sûrement à modifier...
     float VxMax;
     float VyMax;
     float VabsMax;
+
     float angle;
     int direction;
     Texture2D texture;
-    Hitbox hitbox;
-    bool grabbed;
+    IntRectangle rect; // pour collisions avec map
+    Hitbox hitbox; // pour collisions avec entity
+    
+    // pour arc et flèche... à mettre autre part
+    bool grabbed; 
 } Entity;
 
 typedef struct structBlock {

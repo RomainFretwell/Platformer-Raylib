@@ -7,9 +7,9 @@
 #define blockSize 15 // les blocks sont de taille 15x15
 #define sizeCoef 1 // multiplier blockSize par sizeCoef pour des blocks plus gros
 
-extern Vector2int fullScreenSize;
-extern Vector2int smallScreenSize;
-extern Vector2int currentScreenSize;
+extern IntVector2 fullScreenSize;
+extern IntVector2 smallScreenSize;
+extern IntVector2 currentScreenSize;
 extern float screenRatio;
 
 extern bool showBlockHitbox;

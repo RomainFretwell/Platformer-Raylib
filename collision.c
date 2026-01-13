@@ -38,7 +38,7 @@ void updateHitboxEntity(Entity *ent){
     float angle = ent->angle*PI/180 + atanf((ent->texture.height - ent->hitbox.topOffset - ent->hitbox.bottomOffset) / (ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset));
     float AB = ent->texture.height - ent->hitbox.bottomOffset - ent->hitbox.topOffset;
     float BC = ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset;
-    float radius = 0.5*sqrtf(AB*AB + BC*BC);
+    float radius = 0.5f*sqrtf(AB*AB + BC*BC);
 
     ent->hitbox.x = ent->position.x - radius*cosf(angle);
     ent->hitbox.y = ent->position.y - radius*sinf(angle);

@@ -14,18 +14,18 @@
 
 void ToggleFullscreenWindow(){
     if (!IsWindowFullscreen()){
-        SetWindowSize(fullScreenSize.width, fullScreenSize.height);
+        SetWindowSize(fullScreenSize.x, fullScreenSize.y);
         ToggleFullscreen();
-        currentScreenSize.width = fullScreenSize.width;
-        currentScreenSize.height = fullScreenSize.height;
+        currentScreenSize.x = fullScreenSize.x;
+        currentScreenSize.y = fullScreenSize.y;
     } else {
         ToggleFullscreen();
-        SetWindowSize(smallScreenSize.width, smallScreenSize.height);
-        currentScreenSize.width = smallScreenSize.width;
-        currentScreenSize.height = smallScreenSize.height;
+        SetWindowSize(smallScreenSize.x, smallScreenSize.y);
+        currentScreenSize.x = smallScreenSize.x;
+        currentScreenSize.y = smallScreenSize.y;
         // TODO : set window position to a fix point
     }
-    screenRatio = currentScreenSize.width / smallScreenSize.width;
+    screenRatio = currentScreenSize.x / smallScreenSize.x;
 }
 
 void clearMap(int map[], int mapWidth, int mapHeight){
@@ -76,7 +76,7 @@ void initializeMap(int map[], int mapWidth, int mapHeight){
 }
 
 int canJump(Entity ent){
-    return (ent.position.y >= currentScreenSize.height-(2*blockSize*sizeCoef + ent.texture.height)*screenRatio);
+    return (ent.position.y >= currentScreenSize.y-(2*blockSize*sizeCoef + ent.texture.height)*screenRatio);
 }
 
 
@@ -94,38 +94,38 @@ int canJump(Entity ent){
 int main(){
     
     // Window initialization
-    InitWindow(smallScreenSize.width, smallScreenSize.height, "jeu 2D avec Raylib");
-    fullScreenSize.width = GetMonitorWidth(GetCurrentMonitor());
-    fullScreenSize.height = GetMonitorHeight(GetCurrentMonitor());
+    InitWindow(smallScreenSize.x, smallScreenSize.y, "jeu 2D avec Raylib");
+    fullScreenSize.x = GetMonitorWidth(GetCurrentMonitor());
+    fullScreenSize.y = GetMonitorHeight(GetCurrentMonitor());
     currentScreenSize = smallScreenSize;
-    screenRatio = 1.0;
+    screenRatio = 1.0f;
     
     // Load block textures
     Block air;
     air.texture = LoadTexture("resources/air.png"); // transparent texture
     air.solid = false;
     air.breakable = false;
-    air.coefRebond = 0.0;
+    air.coefRebond = 0.0f;
     Block dirt;
     dirt.texture = LoadTexture("resources/dirt.png");
     dirt.solid = true;
     dirt.breakable = true;
-    dirt.coefRebond = 0.0;
+    dirt.coefRebond = 0.0f;
     Block grass;
     grass.texture = LoadTexture("resources/grass.png");
     grass.solid = true;
     grass.breakable = true;
-    grass.coefRebond = 0.0;
+    grass.coefRebond = 0.0f;
     Block stone;
     stone.texture = LoadTexture("resources/stone.png");
     stone.solid = true;
     stone.breakable = true;
-    stone.coefRebond = 0.0;
+    stone.coefRebond = 0.0f;
     Block gravel;
     gravel.texture = LoadTexture("resources/gravel.png");
     gravel.solid = true;
     gravel.breakable = true;
-    gravel.coefRebond = 0.0;
+    gravel.coefRebond = 0.0f;
 
     Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
 
@@ -138,17 +138,17 @@ int main(){
     
     Color background_color = {220, 230, 255, 255};
 
-    float gravity = 0.3;
+    float gravity = 0.3f;
 
     // player initialization
     Entity player;
     player.position = (Vector2){150, 200};
-    player.VxMax = 5.0;
-    player.VyMax = 10.0;
-    player.speed = (Vector2){0, 0};
-    player.acceleration = (Vector2){0.0, gravity};
-    float acceleration_ground = 0.1;
-    player.angle = 0;
+    player.VxMax = 5.0f;
+    player.VyMax = 10.0f;
+    player.speed = (Vector2){0.0f, 0.0f};
+    player.acceleration = (Vector2){0.0f, gravity};
+    float acceleration_ground = 0.1f;
+    player.angle = 0.0f;
     player.direction = 1;
     player.texture = LoadTexture("resources/druid.png");
     player.hitbox.bottomOffset = 2;
@@ -164,10 +164,10 @@ int main(){
     bow.hitbox.topOffset = 0;
     bow.hitbox.leftOffset = 0;
     bow.hitbox.rightOffset = 0;
-    bow.position = (Vector2){(currentScreenSize.width-bow.texture.width)/2, (currentScreenSize.height-bow.texture.height)/2};
+    bow.position = (Vector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2};
     bow.speed = player.speed;
     bow.acceleration = player.acceleration;
-    bow.angle = 135;
+    bow.angle = 135.0f;
     bow.direction = 1;
     updateHitboxEntity(&bow);
 
@@ -176,8 +176,8 @@ int main(){
     arrow.speed = player.speed;
     arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
     int fireSpeed = 10;
-    arrow.VabsMax = 50.0;
-    arrow.angle = 0;
+    arrow.VabsMax = 50.0f;
+    arrow.angle = 0.0f;
     arrow.direction = 1;
     arrow.grabbed = true;
     arrow.texture = LoadTexture("resources/arrow.png");
@@ -188,14 +188,14 @@ int main(){
     updateHitboxEntity(&arrow);
     
     // other variables
-    float jumpCooldown = 1;
-    float coefRebond = 0.1; // 0 = pas de rebond, 1 = rebond parfait
-    float testAngleArc = 1;
+    float jumpCooldown = 1.0f;
+    float coefRebond = 0.1f; // 0 = pas de rebond, 1 = rebond parfait
+    float testAngleArc = 1.0f;
 
     // camera
     Camera2D camera = {
         .target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio},
-        .offset = (Vector2){currentScreenSize.width/2, currentScreenSize.height/2},
+        .offset = (Vector2){currentScreenSize.x/2, currentScreenSize.y/2},
         .rotation = 0,
         .zoom = 1
     };
@@ -206,7 +206,7 @@ int main(){
     double deltaTime = 0.01;
     int size = 1;
 
-    float constanteFPS = 80.0; // 80.0
+    float constanteFPS = 80.0f; // 80.0f
     int maxFPS = 200;
     SetTargetFPS(maxFPS);
 
@@ -222,7 +222,7 @@ int main(){
         // Toggle fullscreen
         if (IsKeyPressed(KEY_F11)){
             ToggleFullscreenWindow();
-            camera.offset = (Vector2){currentScreenSize.width/2, currentScreenSize.height/2};
+            camera.offset = (Vector2){currentScreenSize.x/2, currentScreenSize.y/2};
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
 
@@ -309,8 +309,8 @@ int main(){
         if (player.speed.y < -player.VyMax) player.speed.y = -player.VyMax;
 
         // Rebond
-        if (player.position.y * screenRatio >= currentScreenSize.height-(2*blockSize*sizeCoef + player.texture.height)*screenRatio){
-            player.position.y = currentScreenSize.height / screenRatio - (2*blockSize*sizeCoef + player.texture.height);
+        if (player.position.y * screenRatio >= currentScreenSize.y-(2*blockSize*sizeCoef + player.texture.height)*screenRatio){
+            player.position.y = currentScreenSize.y / screenRatio - (2*blockSize*sizeCoef + player.texture.height);
             if (player.speed.y <= 2.){
                 player.speed.y = 0;
                 player.acceleration.y = 0;
@@ -382,7 +382,7 @@ int main(){
             arrow.speed.y += arrow.acceleration.y * GetFrameTime() * constanteFPS;
         
             // limite vitesse flèche
-            if (distance(arrow.speed, (Vector2) {0.0, 0.0}) > arrow.VabsMax) {
+            if (distance(arrow.speed, (Vector2) {0, 0}) > arrow.VabsMax) {
                 arrow.speed.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
                 arrow.speed.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
             }
@@ -417,12 +417,12 @@ int main(){
 
             // réel
             // arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})*sinf((arrow.angle + atan(arrow.texture.height/arrow.texture.width/2)
-            if ((arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})) >= currentScreenSize.height/screenRatio - 30){
-                // arrow.position.y = currentScreenSize.height/screenRatio - 30;
-                arrow.speed.x = 0.0;
-                arrow.speed.y = 0.0;
-                arrow.acceleration.x = 0.0;
-                arrow.acceleration.y = 0.0;
+            if ((arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})) >= currentScreenSize.y/screenRatio - 30){
+                // arrow.position.y = currentScreenSize.y/screenRatio - 30;
+                arrow.speed.x = 0.0f;
+                arrow.speed.y = 0.0f;
+                arrow.acceleration.x = 0.0f;
+                arrow.acceleration.y = 0.0f;
             }
         }
         
@@ -524,7 +524,7 @@ int main(){
 
         if (showEntityHitbox){
             const char * test0 = TextFormat("entity hitbox ON");
-            DrawText(test0, currentScreenSize.width - 180, 10, 20, RED);
+            DrawText(test0, currentScreenSize.x - 180, 10, 20, RED);
         }
 
         DrawFPS(10, 10);

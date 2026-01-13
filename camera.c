@@ -4,19 +4,19 @@ void limitCameraMap(Camera2D * camera){
     if (camera->target.x < camera->offset.x){
         camera->target.x = camera->offset.x;
     }
-    if (camera->target.x > camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.width){
-        camera->target.x = camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.width;
+    if (camera->target.x > camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.x){
+        camera->target.x = camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.x;
     }
     if (camera->target.y < camera->offset.y){
         camera->target.y = camera->offset.y;
     }
-    if (camera->target.y > camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.height){
-        camera->target.y = camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.height;
+    if (camera->target.y > camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.y){
+        camera->target.y = camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.y;
     }
 }
 
 void cameraFollow(Camera2D * camera, Entity player){
-    float cameraAcceleration = 0.04;
+    float cameraAcceleration = 0.04f;
     camera->target.x += cameraAcceleration * (player.position.x*screenRatio - camera->target.x);
     camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
 }

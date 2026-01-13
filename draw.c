@@ -1,8 +1,8 @@
 #include "draw.h"
 
 void drawCross(int x, int y, Color color){
-    DrawLine(0, y*screenRatio, currentScreenSize.width, y*screenRatio, color);
-    DrawLine(x*screenRatio, 0, x*screenRatio, currentScreenSize.height, color);
+    DrawLine(0, y*screenRatio, currentScreenSize.x, y*screenRatio, color);
+    DrawLine(x*screenRatio, 0, x*screenRatio, currentScreenSize.y, color);
 }
 
 void drawBlock(int x, int y, Block block){
