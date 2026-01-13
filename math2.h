@@ -6,6 +6,10 @@
 #include "structures.h"
 
 float distance(Vector2 objetA, Vector2 objetB);
-int signe(float x);
+float signe(float x);
+float min(float a, float b);
+float max(float a, float b);
+float approach(float current, float target, float increase);
+
 
 #endif // MATH2_H
