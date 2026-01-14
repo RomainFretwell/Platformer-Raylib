@@ -15,6 +15,7 @@ bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2);
 void updateHitboxEntity(Entity *ent);
 void updateHitboxItem(Item *item);
 void indexToHitbox(int index, Hitbox *hitbox);
+void indexToIntRectangle(int index, IntRectangle *rect);
 void handleBlockCollisions(Entity * ent, int map[]);
 int findBlockMap(Entity ent, int mapSizeX, int mapSizeY); // à enlever ?
 

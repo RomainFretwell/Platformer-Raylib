@@ -22,7 +22,7 @@ float max(float a, float b){
     return (a>b)?a:b;
 }
 
-int round(float x){
+int arrondir(float x){
     if (x >= 0.0f){
         return (int) (x + 0.5f);
     }

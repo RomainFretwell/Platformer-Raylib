@@ -10,7 +10,7 @@ float signe(float x);
 int signInt(int x);
 float min(float a, float b);
 float max(float a, float b);
-int round(float x);
+int arrondir(float x);
 float approach(float current, float target, float increase);
 
 

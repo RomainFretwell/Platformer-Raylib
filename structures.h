@@ -15,13 +15,14 @@ typedef struct structIntRectangle {
     int height;
 } IntRectangle;
 
+// renomer type Hitbox en OrientedRectangle, RotatedRectangle ou autre chose
 typedef struct structHitbox {
     float x;
     float y;
     float width;
     float height;
     float angle;
-    
+
     // hitbox offset à modifier ?
     float bottomOffset;
     float topOffset;
@@ -40,15 +41,23 @@ typedef struct structEntity {
     Vector2 speed;
     Vector2 acceleration;
 
-    // sûrement à modifier...
+    // sûrement à modifier... ou enlever et mettre direct dans fonctions car constant ?
     float VxMax;
     float VyMax;
     float VabsMax;
-
+    //const float runSpeed;
+    //const float runAcceleration;
+    //const float runReduce;
+    //const float flyReduce;
+    //const float fallSpeed;
+    //const float jumpSpeed;
+    
     float angle;
     int direction;
     Texture2D texture;
-    IntRectangle rect; // pour collisions avec map
+    int animationState; // idle + walking + runing/dashing + jumping + dying + ... = choix en vertical sur la texture atlas
+    
+    IntRectangle physicsBox; // pour collisions avec map
     Hitbox hitbox; // pour collisions avec entity
     
     // pour arc et flèche... à mettre autre part

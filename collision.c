@@ -57,6 +57,13 @@ void updateHitboxItem(Item *item){ // ajouter décalage en parametre
     rectToPoints(&(item->hitbox));
 }
 
+void indexToIntRectangle(int index, IntRectangle *rect){
+    rect->x = blockSize * (index / mapSizeY);
+    rect->y = blockSize * (index % mapSizeY);
+    rect->width = blockSize;
+    rect->height = blockSize;
+}
+
 void indexToHitbox(int index, Hitbox *hitbox){
     hitbox->x = blockSize * (index / mapSizeY);
     hitbox->y = blockSize * (index % mapSizeY);
@@ -85,38 +92,15 @@ void handleBlockCollisions(Entity * ent, int map[]){
                 //drawHitbox(blockHitbox, BLUE);
                 rectToPoints(&blockHitbox);
                 if (checkCollisionHitboxes(ent->hitbox, blockHitbox)){ // remplacer par while ensuite
-                    int antiCrash = 0;
-                    do {
+                    while (checkCollisionHitboxes(ent->hitbox, blockHitbox)){
                         ent->position.x -= signe(ent->speed.x);
                         ent->position.y -= signe(ent->speed.y);
                         updateHitboxEntity(ent);
-
-                        antiCrash++;
-                        if (antiCrash > 1000){
-                            antiCrash = 0;
-                            printf("\nCRASH dans handleBlockCollision à cause de la boucle while\n");
-                            break;
-                        }
-                    } while (checkCollisionHitboxes(ent->hitbox, blockHitbox));
-
+                    }
                     ent->acceleration.x = 0;
                     ent->speed.x = 0;
-
-                    //*
                     int blockX = n / mapSizeY;
                     int blockY = n % mapSizeY;
-                    
-                    drawBlockHitbox(blockX, blockY, BLUE);
-                    // pas sensé draw car pas entre BeginDrawing et EndDrawing
-                    
-                    const char * test1 = TextFormat("Block grid X = %d", blockX);
-                    DrawText(test1, 310, 50, 20, BLACK);
-                    const char * test2 = TextFormat("Block grid Y = %d", blockY);
-                    DrawText(test2, 310, 70, 20, BLACK);
-                    //*/
-
-
-                    // décaler position de 1 dans la bonne direction (selon vitesse ?)
 			    }
 		    }
         }
