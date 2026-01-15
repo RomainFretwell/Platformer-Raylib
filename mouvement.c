@@ -121,6 +121,11 @@ void mouvement(Entity *player, int map[], float dt){
         player->grounded = false;
     }
 
+    // controler la hauteur du saut en appuyant plus ou moins longtemps
+    if (!IsKeyDown(KEY_UP) && player->speed.y < 0){
+        player->speed.y = 0;
+    }
+
     if(!player->grounded){
         //player->animationState = PLAYER_ANIM_JUMP;
     }
