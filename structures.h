@@ -60,6 +60,9 @@ typedef struct structEntity {
     IntRectangle physicsBox; // pour collisions avec map
     Hitbox hitbox; // pour collisions avec entity
     
+    Vector2 remain;
+    bool grounded;
+    
     // pour arc et flèche... à mettre autre part
     bool grabbed; 
 } Entity;

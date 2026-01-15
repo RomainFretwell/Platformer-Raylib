@@ -1,8 +1,5 @@
 #include "mouvement.h"
 
-//constantes ici ok ??
-static Vector2 remain = {0.0f,0.0f}; // static -> n'initialise remain qu'une fois puis le retient lors du prochain appel de mouvement
-static bool grounded = false;
 const float runSpeed = 2.0f;
 const float runAcceleration = 10.0f;
 const float runReduce = 22.0f; 
@@ -11,7 +8,7 @@ const float gravity = 13.0f;
 const float fallSpeed = 3.6f;
 const float jumpSpeed = -3.0f;
 
-/*// à faire
+/*// à faire plus tard
 bool isGrounded(Entity ent, int map[]){
     //return ||  ||  || ;
 }
@@ -21,21 +18,22 @@ bool isSliding(Entity ent, int map[]){
 }
 */
 
-// 2e argument = truc collide ??
 static void moveX(Entity *ent, int map[]){
-    remain.x += ent->speed.x;
-    int moveX = arrondir(remain.x);
+    ent->remain.x += ent->speed.x;
+    int moveX = arrondir(ent->remain.x);
+    
     if(moveX != 0){
-        remain.x -= moveX;
+        ent->remain.x -= moveX;
         int moveSign = signInt(moveX); // droite ou gauche
         bool collisionHappened = false;
+
+        int centerBlock = findBlockMap(*ent, mapSizeX, mapSizeY);
 
         // bouge ent jusqu'à une collision
         while(!collisionHappened && moveX != 0){
             ent->physicsBox.x += moveSign;
 
             IntRectangle block;
-            int centerBlock = findBlockMap(*ent, mapSizeX, mapSizeY);
             for (int i = -1; i<2; i++){
                 for (int j = -1; j<2; j++){
                     int n = centerBlock + mapSizeY*i + j;
@@ -62,10 +60,10 @@ static void moveX(Entity *ent, int map[]){
 
 
 static void moveY(Entity *ent, int map[]){
-    remain.y += ent->speed.y;
-    int moveY = arrondir(remain.y);
+    ent->remain.y += ent->speed.y;
+    int moveY = arrondir(ent->remain.y);
     if(moveY != 0){
-        remain.y -= moveY;
+        ent->remain.y -= moveY;
         int moveSign = signInt(moveY); // droite ou gauche
         bool collisionHappened = false;
 
@@ -83,7 +81,7 @@ static void moveY(Entity *ent, int map[]){
                         if (rectangleCollision(ent->physicsBox, block)){
                             // Moving down/falling
                             if(ent->speed.y > 0.0f){
-                                grounded = true;
+                                ent->grounded = true;
                             }
                             ent->speed.y = 0;
                             collisionHappened = true;
@@ -115,21 +113,21 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     // jump
-    if(IsKeyPressed(KEY_UP) && grounded){
+    if(IsKeyPressed(KEY_UP) && player->grounded){
         player->speed.y = jumpSpeed;
         //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
         //player->speed.y += player->solidSpeed.y;
         //play_sound("jump");
-        grounded = false;
+        player->grounded = false;
     }
 
-    if(!grounded){
+    if(!player->grounded){
         //player->animationState = PLAYER_ANIM_JUMP;
     }
     
 
     if (IsKeyDown(KEY_LEFT)){
-        if (grounded){
+        if (player->grounded){
             //player->animationState = PLAYER_ANIM_JUMP;
         }
 
@@ -142,7 +140,7 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     if (IsKeyDown(KEY_RIGHT)){
-        if (grounded){
+        if (player->grounded){
             //player->animationState = PLAYER_ANIM_JUMP;
         }
 
@@ -156,7 +154,7 @@ void mouvement(Entity *player, int map[], float dt){
 
     // friction
     if(!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT)){
-        if(grounded){
+        if(player->grounded){
             player->speed.x = approach(player->speed.x, 0, runReduce * dt);
         }
         else{

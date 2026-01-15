@@ -57,6 +57,11 @@ void updateHitboxItem(Item *item){ // ajouter décalage en parametre
     rectToPoints(&(item->hitbox));
 }
 
+void updatePhysicsBoxEntity(Entity *ent){
+    ent->physicsBox.x = ent->position.x - 11;
+    ent->physicsBox.y = ent->position.y - 12;
+}
+
 void indexToIntRectangle(int index, IntRectangle *rect){
     rect->x = blockSize * (index / mapSizeY);
     rect->y = blockSize * (index % mapSizeY);

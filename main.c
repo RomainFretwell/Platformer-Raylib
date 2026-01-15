@@ -7,6 +7,7 @@
 #include "math2.h"
 #include "camera.h"
 #include "collision.h"
+#include "mouvement.h"
 
 // ----------------------------------------------------------------------------------------
 //                                   Game functions
@@ -138,11 +139,11 @@ int main(){
     
     Color background_color = {220, 230, 255, 255};
 
-    float gravity = 0.3f;
+    float gravity = 13.0f;
 
     // player initialization
     Entity player;
-    player.position = (Vector2){150, 200};
+    player.position = (Vector2){350, 150};
     player.VxMax = 5.0f;
     player.VyMax = 10.0f;
     player.speed = (Vector2){0.0f, 0.0f};
@@ -156,6 +157,13 @@ int main(){
     player.hitbox.leftOffset = 8;
     player.hitbox.rightOffset = 4;
     updateHitboxEntity(&player);
+    player.physicsBox = (IntRectangle){ player.position.x - 11,
+                                        player.position.y - 12,
+                                        22,
+                                        24
+                                    };
+    player.remain = (Vector2){0.0f,0.0f};
+    player.grounded = false;
     
     // bow
     Entity bow;
@@ -175,8 +183,8 @@ int main(){
     arrow.position =  bow.position; // à changer à player.position
     arrow.speed = player.speed;
     arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
-    int fireSpeed = 10;
-    arrow.VabsMax = 50.0f;
+    int fireSpeed = 100;
+    arrow.VabsMax = 500.0f;
     arrow.angle = 0.0f;
     arrow.direction = 1;
     arrow.grabbed = true;
@@ -203,10 +211,9 @@ int main(){
     // time variables
     double frameStart;
     double frameEnd;
-    double deltaTime = 0.01;
+    double deltaTime = 0.005;
     int size = 1;
 
-    float constanteFPS = 80.0f; // 80.0f
     int maxFPS = 200;
     SetTargetFPS(maxFPS);
 
@@ -226,116 +233,13 @@ int main(){
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//      ##################   Mouvement   #######################
-
-        if (IsKeyDown(KEY_RIGHT) && !IsKeyDown(KEY_LEFT) && player.speed.x < player.VxMax){
-            player.speed.x += acceleration_ground;
-            player.direction = 1;
-        }
-        else if (IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && player.speed.x > -player.VxMax){
-            player.speed.x -= acceleration_ground;
-            player.direction = -1;
-        }
-        // ralentissement friction sol
-        else if (!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT)){
-            if (player.speed.x > 0){
-                player.speed.x -= acceleration_ground;
-                if (player.speed.x < 0) player.speed.x = 0.0;
-            }
-            if (player.speed.x < 0){
-                player.speed.x += acceleration_ground;
-                if (player.speed.x > 0) player.speed.x = 0.0;
-            }
-            if (-0.1 < player.speed.x && player.speed.x < 0.1){
-                player.speed.x = 0.0;
-                player.acceleration.x = 0.0;
-            }
-        }
-
-        if (IsKeyDown(KEY_SPACE)){
-            player.position.y = 0;
-            player.speed.y = 0;
-            player.acceleration.y = gravity;
-        }
-        
-        // test haut / bas
-        if (IsKeyDown(KEY_UP)){
-            player.speed.y = -5.0;
-        }
-        else if (IsKeyDown(KEY_DOWN)){
-            player.speed.y = 5.0;
-        }
-        else {
-            player.speed.y = 0.0;
-        }
-
-        /* jump + gravitée + collision sol
-        // player jump
-        if (IsKeyDown(KEY_UP) && canJump(player)){
-            player.speed.y = - 2 * player.VyMax;
-            player.acceleration.y = gravity;
-            // jumpCooldown = 1;
-        }
-
-        // gravité player
-        player.speed.y += player.acceleration.y * GetFrameTime() * constanteFPS;
-        // limite vitesse player
-        if (player.speed.x > player.VxMax) player.speed.x = player.VxMax;
-        if (player.speed.y > player.VyMax) player.speed.y = player.VyMax;
-        if (player.speed.x < -player.VxMax) player.speed.x = -player.VxMax;
-        if (player.speed.y < -player.VyMax) player.speed.y = -player.VyMax;
-
-        // Rebond
-        if (player.position.y * screenRatio >= currentScreenSize.y-(2*blockSize*sizeCoef + player.texture.height)*screenRatio){
-            player.position.y = currentScreenSize.y / screenRatio - (2*blockSize*sizeCoef + player.texture.height);
-            if (player.speed.y <= 2.){
-                player.speed.y = 0;
-                player.acceleration.y = 0;
-            }
-            else if (jumpCooldown == 1){
-                player.speed.y *= -coefRebond;
-                player.acceleration.y = gravity;
-            }
-        }
-        jumpCooldown -= 0.1 * GetFrameTime() * 200;
-
-        */
-        
-        player.position.x += player.speed.x * GetFrameTime() * constanteFPS;
-        player.position.y += player.speed.y * GetFrameTime() * constanteFPS;
-
-        float totalSpeed = distance(player.speed, (Vector2){0, 0});
-        
-        
-
         if (IsKeyPressed(KEY_H)){
             showBlockHitbox = !showBlockHitbox;
             showEntityHitbox = !showEntityHitbox;
         }
         
+        mouvement(&player, map, deltaTime);
+        updatePhysicsBoxEntity(&player);
 
 // ----------------------------------------------------------------------------------------
 //                                   Arrow
@@ -379,7 +283,7 @@ int main(){
         else {          
             
             // gravité flèche
-            arrow.speed.y += arrow.acceleration.y * GetFrameTime() * constanteFPS;
+            arrow.speed.y += arrow.acceleration.y * deltaTime;
         
             // limite vitesse flèche
             if (distance(arrow.speed, (Vector2) {0, 0}) > arrow.VabsMax) {
@@ -389,8 +293,8 @@ int main(){
             
             // si collion avec block alors speed = 0 et acceleration = 0
 
-            arrow.position.x += arrow.speed.x * screenRatio * GetFrameTime() * constanteFPS;
-            arrow.position.y += arrow.speed.y * screenRatio * GetFrameTime() * constanteFPS;
+            arrow.position.x += arrow.speed.x * screenRatio * deltaTime;
+            arrow.position.y += arrow.speed.y * screenRatio * deltaTime;
 
             // arrow angle
             if (arrow.speed.x != 0 || arrow.speed.y != 0){
@@ -427,14 +331,12 @@ int main(){
         }
         
 // ----------------------------------------------------------------------------------------
-//                             Collision handleing
+//                             update hitboxes
 // ----------------------------------------------------------------------------------------
 
         updateHitboxEntity(&player);
         updateHitboxEntity(&bow);
         updateHitboxEntity(&arrow);
-
-        handleBlockCollisions(&player, map);
 
 
 // ----------------------------------------------------------------------------------------
@@ -473,40 +375,20 @@ int main(){
         }
         */
         
-        
-        
-        // affichage des entity dans le bon ordre
+        // affichage des entity (dans le bon ordre)
         drawEntity(player);
         drawEntity(bow);
         drawEntity(arrow);
-        
-        /* drawTexturePro bow et arrow
-        size = 1;
-        DrawTexturePro(bow.texture,
-                        (Rectangle) {0, 0, bow.texture.width, bow.texture.height}, // source
-                        (Rectangle) {(bow.position.x + bow.texture.width/2)*screenRatio,
-                                    (bow.position.y + bow.texture.height/2)*screenRatio,
-                                    size*bow.texture.width*screenRatio,
-                                    size*bow.texture.height*screenRatio}, // dest
-                        (Vector2) {bow.texture.width * size * screenRatio / 2, bow.texture.height * size * screenRatio /2}, // origin
-                        bow.angle, WHITE); // angle
-        
-        // arrow drawing
-        DrawTexturePro(arrow.texture,
-                        (Rectangle) {0, 0, arrow.texture.width, arrow.texture.height}, // source
-                        (Rectangle) {(arrow.position.x + bow.texture.width/2)*screenRatio,
-                                    (arrow.position.y + bow.texture.height/2)*screenRatio,
-                                    size*arrow.texture.width*screenRatio,
-                                    size*arrow.texture.height*screenRatio}, // dest
-                        (Vector2) {arrow.texture.width * size * screenRatio / 2, arrow.texture.height * size * screenRatio / 2}, // origin aka le centre de l'image
-                                    // dest.width/2, dest.height/2
-                        arrow.angle, WHITE); // angle
-        */
         
         if (showEntityHitbox){
             drawHitbox(player.hitbox, RED);
             drawHitbox(arrow.hitbox, ORANGE);
             drawHitbox(bow.hitbox, YELLOW);
+            
+            DrawRectangle(  player.physicsBox.x * screenRatio,
+                            player.physicsBox.y * screenRatio,
+                            player.physicsBox.width * screenRatio,
+                            player.physicsBox.height * screenRatio, GREEN);
         }
 
         // test croix player
@@ -514,12 +396,15 @@ int main(){
             drawCross((int) player.position.x, (int) player.position.y, BLACK);
         }
 
-        // debug info
+        if (IsKeyDown(KEY_SPACE)){
+            player.position.y = 150;
+        }
+
         EndMode2D();
 
 
 // ----------------------------------------------------------------------------------------
-//                                   TESTS
+//                                 DEBUG INFO
 // ----------------------------------------------------------------------------------------
 
         if (showEntityHitbox){
@@ -528,7 +413,7 @@ int main(){
         }
 
         DrawFPS(10, 10);
-        const char * test = TextFormat("Frame time = %f", GetFrameTime());
+        const char * test = TextFormat("Frame time = %f", deltaTime);
         DrawText(test, 10, 30, 20, BLACK);
         
         
@@ -542,11 +427,11 @@ int main(){
         DrawText(test01, 10, 90, 20, BLACK);
         const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
         DrawText(test02, 10, 110, 20, BLACK);
-        /*const char * test3 = TextFormat("speed X = %f", player.speed.x);
-        DrawText(test3, 10, 50, 20, BLACK);
+        const char * test3 = TextFormat("speed X = %f", player.speed.x);
+        DrawText(test3, 10, 130, 20, BLACK);
         const char * test4 = TextFormat("speed Y = %f", player.speed.y);
-        DrawText(test4, 10, 70, 20, BLACK);
-        */
+        DrawText(test4, 10, 150, 20, BLACK);
+        
 
         /* test arrow
         // test arrow
@@ -562,53 +447,6 @@ int main(){
         DrawText(test12, 500, 130, 20, BLACK);
         const char * test15 = TextFormat("Bow speed Y = %f", bow.speed.y);
         DrawText(test15, 500, 150, 20, BLACK);
-        */
-        
-        /* test collisions triangles
-        // test collision de 2 triangles
-        Vector2 A1 = GetMousePosition();
-        Vector2 B1 = {A1.x + 50, A1.y};
-        Vector2 C1 = {A1.x + 25, A1.y - 50};
-        Vector2 A2 = (Vector2){320, 180};
-        Vector2 B2 = (Vector2){370, 180};
-        Vector2 C2 = (Vector2){345, 130};
-        bool testCollision = checkCollisionTriangles(A1, B1, C1, A2, B2, C2);
-        const char * test13 = TextFormat("Collision triangles ? %s", testCollision?"OUI":"NON");
-        DrawText(test13, 30, 150, 20, BLACK);
-        DrawTriangle(A1, B1, C1, RED);
-        DrawTriangle(A2, B2, C2, BLUE);
-        */
-        
-        /* test collision de 2 hitbox
-        Hitbox hit1;
-        hit1.x = GetMousePosition().x / screenRatio;
-        hit1.y = GetMousePosition().y / screenRatio;
-        hit1.width = 50;
-        hit1.height = 20;
-        hit1.angle = 30;
-        hit1.A = (Vector2) {400, 200};
-        hit1.B = (Vector2) {450, 200};
-        hit1.C = (Vector2) {450, 220};
-        hit1.D = (Vector2) {400, 220};
-        rectToPoints(&hit1);
-        drawHitbox(hit1, RED);
-        Hitbox hit2;
-        hit2.x = 700 / screenRatio;
-        hit2.y = 300 / screenRatio;
-        hit2.width = 80;
-        hit2.height = 15;
-        hit2.angle = bow.angle;
-        hit2.A = (Vector2) {400, 200};
-        hit2.B = (Vector2) {450, 200};
-        hit2.C = (Vector2) {450, 220};
-        hit2.D = (Vector2) {400, 220};
-        rectToPoints(&hit2);
-        drawHitbox(hit2, BLUE);
-        
-        
-        bool testCollisionHitbox = checkCollisionHitboxes(hit1, hit2);
-        const char * test14 = TextFormat("Collision hitbox ? %s", testCollisionHitbox?"OUI":"NON");
-        DrawText(test14, 30, 180, 20, BLACK);
         */
         
         

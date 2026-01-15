@@ -14,6 +14,7 @@ void rectToPoints(Hitbox *hitbox);
 bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2);
 void updateHitboxEntity(Entity *ent);
 void updateHitboxItem(Item *item);
+void updatePhysicsBoxEntity(Entity *ent);
 void indexToHitbox(int index, Hitbox *hitbox);
 void indexToIntRectangle(int index, IntRectangle *rect);
 void handleBlockCollisions(Entity * ent, int map[]);
