@@ -1,7 +1,7 @@
 #include "math2.h"
 
-float distance(Vector2 objetA, Vector2 objetB){
-    return sqrtf((objetA.x - objetB.x) * (objetA.x - objetB.x) + (objetA.y - objetB.y) * (objetA.y - objetB.y));
+float distance(IntVector2 A, IntVector2 B){
+    return sqrtf((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
 }
 
 float signe(float x){

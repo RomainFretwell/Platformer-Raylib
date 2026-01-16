@@ -58,8 +58,8 @@ void updateHitboxItem(Item *item){ // ajouter décalage en parametre
 }
 
 void updatePhysicsBoxEntity(Entity *ent){
-    ent->physicsBox.x = ent->position.x - 11;
-    ent->physicsBox.y = ent->position.y - 12;
+    ent->physicsBox.x = ent->position.x - ent->physicsBox.width/2;
+    ent->physicsBox.y = ent->position.y - ent->physicsBox.height/2;
 }
 
 void indexToIntRectangle(int index, IntRectangle *rect){
@@ -78,10 +78,9 @@ void indexToHitbox(int index, Hitbox *hitbox){
     //rectToPoints(&(*hitbox)); // à changer
 }
 
-// à enlever ?
 int findBlockMap(Entity ent, int mapSizeX, int mapSizeY){
-    int x = (int) ent.position.x / blockSize;
-    int y = (int) ent.position.y / blockSize;
+    int x = ent.position.x / blockSize;
+    int y = ent.position.y / blockSize;
     return x%mapSizeX * mapSizeY + y%mapSizeY; // % mapSizeX  ?
 }
 
@@ -104,8 +103,6 @@ void handleBlockCollisions(Entity * ent, int map[]){
                     }
                     ent->acceleration.x = 0;
                     ent->speed.x = 0;
-                    int blockX = n / mapSizeY;
-                    int blockY = n % mapSizeY;
 			    }
 		    }
         }

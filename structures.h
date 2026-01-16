@@ -37,7 +37,7 @@ typedef struct structHitbox {
 } Hitbox; // rectangle with rotation
 
 typedef struct structEntity {
-    Vector2 position;
+    IntVector2 position;
     Vector2 speed;
     Vector2 acceleration;
 
@@ -75,7 +75,7 @@ typedef struct structBlock {
 } Block;
 
 typedef struct structItem {
-    Vector2 position;
+    IntVector2 position;
     Vector2 speed;
     Vector2 acceleration;
     float angle;

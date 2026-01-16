@@ -52,7 +52,7 @@ void initializeMap(int map[], int mapWidth, int mapHeight){
     for (int x = 20; x < mapWidth; x++){
         map[x*mapHeight + mapHeight - 3] = 4;
     }
-    for (int x = 25; x < mapWidth; x+=3){
+    for (int x = 100; x < mapWidth; x+=3){
         map[x*mapHeight + mapHeight - 4] = 3;
     }
     for (int x = 0; x < mapWidth; x++){
@@ -75,14 +75,6 @@ void initializeMap(int map[], int mapWidth, int mapHeight){
         map[24*mapHeight + y] = 4;
     }
 }
-
-int canJump(Entity ent){
-    return (ent.position.y >= currentScreenSize.y-(2*blockSize*sizeCoef + ent.texture.height)*screenRatio);
-}
-
-
-// remplacer par colision // && cooldown(variable, jumpCooldown)
-// reset timer cooldown
 
 
 
@@ -143,12 +135,11 @@ int main(){
 
     // player initialization
     Entity player;
-    player.position = (Vector2){350, 150};
+    player.position = (IntVector2){350, 150};
     player.VxMax = 5.0f;
     player.VyMax = 10.0f;
     player.speed = (Vector2){0.0f, 0.0f};
     player.acceleration = (Vector2){0.0f, gravity};
-    float acceleration_ground = 0.1f;
     player.angle = 0.0f;
     player.direction = 1;
     player.texture = LoadTexture("resources/druid.png");
@@ -157,11 +148,11 @@ int main(){
     player.hitbox.leftOffset = 8;
     player.hitbox.rightOffset = 4;
     updateHitboxEntity(&player);
-    player.physicsBox = (IntRectangle){ player.position.x - 11,
-                                        player.position.y - 12,
-                                        22,
-                                        24
-                                    };
+    player.physicsBox.width = 22;
+    player.physicsBox.height = 24;
+    player.physicsBox.x = player.position.x - player.physicsBox.width/2;
+    player.physicsBox.y = player.position.y - player.physicsBox.height/2;
+    
     player.remain = (Vector2){0.0f,0.0f};
     player.grounded = false;
     
@@ -172,7 +163,7 @@ int main(){
     bow.hitbox.topOffset = 0;
     bow.hitbox.leftOffset = 0;
     bow.hitbox.rightOffset = 0;
-    bow.position = (Vector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2};
+    bow.position = (IntVector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2};
     bow.speed = player.speed;
     bow.acceleration = player.acceleration;
     bow.angle = 135.0f;
@@ -195,10 +186,9 @@ int main(){
     arrow.hitbox.rightOffset = 0;
     updateHitboxEntity(&arrow);
     
-    // other variables
-    float jumpCooldown = 1.0f;
-    float coefRebond = 0.1f; // 0 = pas de rebond, 1 = rebond parfait
+    // autres variables
     float testAngleArc = 1.0f;
+    bool showCross = true; // pour dessinà supprimer 
 
     // camera
     Camera2D camera = {
@@ -212,7 +202,6 @@ int main(){
     double frameStart;
     double frameEnd;
     double deltaTime = 0.005;
-    int size = 1;
 
     int maxFPS = 200;
     SetTargetFPS(maxFPS);
@@ -269,8 +258,8 @@ int main(){
                 arrow.angle = bow.angle - 135;
                 arrow.acceleration.x = 0;
                 arrow.acceleration.y = gravity;
-                arrow.speed.x = fireSpeed * cosf(arrow.angle * PI/180) / screenRatio;
-                arrow.speed.y = fireSpeed * sinf(arrow.angle * PI/180) / screenRatio;
+                arrow.speed.x = fireSpeed * cosf(arrow.angle * PI/180);
+                arrow.speed.y = fireSpeed * sinf(arrow.angle * PI/180);
             }
             else {
                 arrow.acceleration = bow.acceleration;
@@ -286,7 +275,7 @@ int main(){
             arrow.speed.y += arrow.acceleration.y * deltaTime;
         
             // limite vitesse flèche
-            if (distance(arrow.speed, (Vector2) {0, 0}) > arrow.VabsMax) {
+            if (distance((IntVector2) {(int) arrow.speed.x, (int) arrow.speed.y}, (IntVector2) {0, 0}) > arrow.VabsMax) {
                 arrow.speed.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
                 arrow.speed.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
             }
@@ -321,7 +310,7 @@ int main(){
 
             // réel
             // arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})*sinf((arrow.angle + atan(arrow.texture.height/arrow.texture.width/2)
-            if ((arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})) >= currentScreenSize.y/screenRatio - 30){
+            if ((arrow.position.y + distance((IntVector2){arrow.texture.width, arrow.texture.height/2}, (IntVector2){0, 0})) >= currentScreenSize.y/screenRatio - 30){
                 // arrow.position.y = currentScreenSize.y/screenRatio - 30;
                 arrow.speed.x = 0.0f;
                 arrow.speed.y = 0.0f;
@@ -392,11 +381,14 @@ int main(){
         }
 
         // test croix player
-        if (IsKeyDown(KEY_C)){
-            drawCross((int) player.position.x, (int) player.position.y, BLACK);
+        if (IsKeyPressed(KEY_C)){
+            showCross = !showCross;
+        }
+        if (showCross){
+            drawCross(player.position.x, player.position.y, BLACK);
         }
 
-        if (IsKeyDown(KEY_SPACE)){
+        if (IsKeyPressed(KEY_SPACE)){
             player.position.y = 150;
         }
 
@@ -418,11 +410,11 @@ int main(){
         
         
         // test player
-        const char * test1 = TextFormat("World position X = %f", player.position.x);
+        const char * test1 = TextFormat("World position X = %d", player.position.x);
         DrawText(test1, 10, 50, 20, BLACK);
-        const char * test2 = TextFormat("World position Y = %f", player.position.y);
+        const char * test2 = TextFormat("World position Y = %d", player.position.y);
         DrawText(test2, 10, 70, 20, BLACK);
-        Vector2 testScreen = GetWorldToScreen2D(player.position, camera);
+        Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
         const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
         DrawText(test01, 10, 90, 20, BLACK);
         const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
@@ -439,9 +431,9 @@ int main(){
         DrawText(test8, 500, 50, 20, BLACK);
         const char * test9 = TextFormat("Arrow speed Y = %f", arrow.speed.y);
         DrawText(test9, 500, 70, 20, BLACK);
-        const char * test10 = TextFormat("Arrow position X = %f", arrow.position.x);
+        const char * test10 = TextFormat("Arrow position X = %d", arrow.position.x);
         DrawText(test10, 500, 90, 20, BLACK);
-        const char * test11 = TextFormat("Arrow position Y = %f", arrow.position.y);
+        const char * test11 = TextFormat("Arrow position Y = %d", arrow.position.y);
         DrawText(test11, 500, 110, 20, BLACK);
         const char * test12 = TextFormat("Arrow angle = %d", arrow.angle);
         DrawText(test12, 500, 130, 20, BLACK);

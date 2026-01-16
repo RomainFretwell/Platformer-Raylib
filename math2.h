@@ -5,7 +5,7 @@
 #include <math.h>
 #include "structures.h"
 
-float distance(Vector2 objetA, Vector2 objetB);
+float distance(IntVector2 A, IntVector2 B);
 float signe(float x);
 int signInt(int x);
 float min(float a, float b);
