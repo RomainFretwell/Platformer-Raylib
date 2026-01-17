@@ -9,7 +9,9 @@ const float fallSpeed = 3.6f;
 const float jumpSpeed = -3.0f;
 const float glideSpeed = 0.7f;
 const float wallSlideSpeed = 0.3f;
+const Vector2 wallJumpSpeed = {-3.3f, -2.0f};
 bool wallSliding = false;
+bool canGlide = true;
 
 static void moveX(Entity *ent, int map[]){
     ent->remain.x += ent->speed.x;
@@ -97,14 +99,17 @@ static void moveY(Entity *ent, int map[]){
     }
 }
 
-bool isWallSliding(Entity *ent, int map[]){
-    if (ent->grounded) return false;
+bool isWallSliding(Entity *player, int map[]){
+    if (player->grounded) return false;
     int touchWall = 2;
-    if (touchWall < ent->physicsBox.x - blockSize * (int) (ent->physicsBox.x / blockSize) && 
-        touchWall < blockSize * (int) ((ent->physicsBox.x + ent->physicsBox.width) / blockSize) - (ent->physicsBox.x + ent->physicsBox.width))
+    if (touchWall < player->physicsBox.x - blockSize * (int) (player->physicsBox.x / blockSize) && 
+        touchWall < blockSize * (int) ((player->physicsBox.x + player->physicsBox.width) / blockSize) - (player->physicsBox.x + player->physicsBox.width))
         return false;
 
-    int sideBlock = findBlockMap(*ent, mapSizeX, mapSizeY) + mapSizeY*ent->direction;
+    int sideBlock = findBlockMap(*player, mapSizeX, mapSizeY) + mapSizeY*player->direction;
+    if (map[sideBlock + mapSizeY + 1] != 0 || map[sideBlock - 2*mapSizeY*player->direction + 1] != 0){
+        return false;
+    }
     if (map[sideBlock-1] != 0 || map[sideBlock] != 0 || map[sideBlock+1] != 0){
         return true;
     }
@@ -131,7 +136,7 @@ void mouvement(Entity *player, int map[], float dt){
     DrawText(test, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
 
     // jump
-    if(IsKeyPressed(KEY_UP)){
+    if(IsKeyDown(KEY_UP)){
         if (player->grounded){
             player->speed.y = jumpSpeed;
             //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
@@ -140,8 +145,8 @@ void mouvement(Entity *player, int map[], float dt){
             player->grounded = false;
         }
         else if(wallSliding){
-            player->speed.y = jumpSpeed;
-            player->speed.x = - player->direction * runSpeed;
+            player->speed.y = wallJumpSpeed.y;
+            player->speed.x = player->direction * wallJumpSpeed.x;
             //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
             //player->speed.y += player->solidSpeed.y;
             //play_sound("jump");
@@ -196,7 +201,13 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     // glide
-    if (IsKeyDown(KEY_G) && player->speed.y > 0){
+    if (player->grounded || wallSliding){
+        canGlide = false;
+    }
+    else if (!IsKeyDown(KEY_UP) && player->speed.y > 0){
+        canGlide = true;
+    }
+    if (IsKeyDown(KEY_UP) && canGlide){
         player->speed.y = approach(player->speed.y, glideSpeed, gravity * dt);
         // animation gliding
     }
@@ -208,7 +219,7 @@ void mouvement(Entity *player, int map[], float dt){
         player->speed.y = approach(player->speed.y, fallSpeed, gravity * dt);
     }
     
-    moveX(&(*player), map); // à vérifier
+    moveX(&(*player), map);
     updatePhysicsBoxEntity(&(*player));
     
     moveY(&(*player), map);
