@@ -4,6 +4,10 @@ float distance(IntVector2 A, IntVector2 B){
     return sqrtf((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
 }
 
+float distanceFloat(Vector2 A, Vector2 B){
+    return sqrtf((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+}
+
 float signe(float x){
     if (x > 0) return 1.0f;
     else if (x < 0) return -1.0f;

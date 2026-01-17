@@ -21,8 +21,22 @@ void cameraFollow(Camera2D * camera, Entity player){
     camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
 }
 
-void limitCameraFollow(Camera2D * camera, Entity player){
-    int cameraFollowThresh = 120;
+void cameraFollow2(Camera2D * camera, Entity player, float dt){
+    float cameraAcceleration = 0.04f;
+    float offset = 100;
+    float cameraSpeed = 100;
+    
+    if (player.speed.x == 0){
+        camera->target.x = approach(camera->target.x, player.position.x*screenRatio, cameraSpeed * dt);
+    }
+    else {
+        camera->target.x = approach(camera->target.x, (player.position.x + player.direction*offset)*screenRatio, cameraSpeed * dt);
+    }
+    
+    camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
+}
+
+void limitCameraFollow(Camera2D * camera, Entity player, int cameraFollowThresh){
     if ((player.position.x - cameraFollowThresh) * screenRatio > camera->target.x){
         camera->target.x = (player.position.x - cameraFollowThresh) * screenRatio;
     }

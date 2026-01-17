@@ -74,6 +74,10 @@ void initializeMap(int map[], int mapWidth, int mapHeight){
         map[20*mapHeight + y] = 4;
         map[24*mapHeight + y] = 4;
     }
+
+    for (int x = 4; x < mapWidth; x++){
+        map[x*mapHeight + 15] = 3;
+    }
 }
 
 
@@ -131,7 +135,7 @@ int main(){
     
     Color background_color = {220, 230, 255, 255};
 
-    float gravity = 13.0f;
+    float gravity = 13.0f; //0.3f
 
     // player initialization
     Entity player;
@@ -174,8 +178,8 @@ int main(){
     arrow.position =  bow.position; // à changer à player.position
     arrow.speed = player.speed;
     arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
-    int fireSpeed = 100;
-    arrow.VabsMax = 500.0f;
+    int fireSpeed = 10;
+    arrow.VabsMax = 50.0f;
     arrow.angle = 0.0f;
     arrow.direction = 1;
     arrow.grabbed = true;
@@ -218,6 +222,8 @@ int main(){
         // Toggle fullscreen
         if (IsKeyPressed(KEY_F11)){
             ToggleFullscreenWindow();
+
+            // besoin de ça ??
             camera.offset = (Vector2){currentScreenSize.x/2, currentScreenSize.y/2};
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
@@ -275,7 +281,7 @@ int main(){
             arrow.speed.y += arrow.acceleration.y * deltaTime;
         
             // limite vitesse flèche
-            if (distance((IntVector2) {(int) arrow.speed.x, (int) arrow.speed.y}, (IntVector2) {0, 0}) > arrow.VabsMax) {
+            if (distanceFloat(arrow.speed, (Vector2) {0.0f, 0.0f}) > arrow.VabsMax) {
                 arrow.speed.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
                 arrow.speed.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
             }
@@ -310,7 +316,7 @@ int main(){
 
             // réel
             // arrow.position.y + distance((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0, 0.0})*sinf((arrow.angle + atan(arrow.texture.height/arrow.texture.width/2)
-            if ((arrow.position.y + distance((IntVector2){arrow.texture.width, arrow.texture.height/2}, (IntVector2){0, 0})) >= currentScreenSize.y/screenRatio - 30){
+            if ((arrow.position.y + distanceFloat((Vector2){arrow.texture.width, arrow.texture.height/2}, (Vector2){0.0f, 0.0f})) >= currentScreenSize.y/screenRatio - 30){
                 // arrow.position.y = currentScreenSize.y/screenRatio - 30;
                 arrow.speed.x = 0.0f;
                 arrow.speed.y = 0.0f;
@@ -347,9 +353,17 @@ int main(){
 
         BeginMode2D(camera);
 
-        cameraFollow(&camera, player);
-        limitCameraFollow(&camera, player);
-
+        //float aheadAmount = 5000;
+        //float smoothSpeed = 500;
+        //camera.target.x = approach(camera.target.x, (player.position.x + aheadAmount * player.speed.x * deltaTime) * screenRatio, smoothSpeed*deltaTime); // sans dt ??
+        //camera.target.y = approach(camera.target.y, (player.position.y + aheadAmount * player.speed.y * deltaTime) * screenRatio, smoothSpeed*deltaTime); // sans dt ??
+        if (!IsKeyDown(KEY_X)){
+            cameraFollow(&camera, player);
+            //cameraFollow2(&camera, player, deltaTime);
+            int cameraFollowThresh = 120;
+            limitCameraFollow(&camera, player, cameraFollowThresh);
+        }
+        
         drawMap(map, blockID);
         /* test affichage map dans le terminal
         if (IsKeyPressed(KEY_T)){

@@ -11,16 +11,6 @@ const float glideSpeed = 0.7f;
 const float wallSlideSpeed = 0.3f;
 bool wallSliding = false;
 
-/*// à faire plus tard
-bool isGrounded(Entity ent, int map[]){
-    //return ||  ||  || ;
-}
-
-bool isSliding(Entity ent, int map[]){
-    //return ||  ||  || ;
-}
-*/
-
 static void moveX(Entity *ent, int map[]){
     ent->remain.x += ent->speed.x;
     int moveX = arrondir(ent->remain.x);
@@ -65,7 +55,7 @@ static void moveX(Entity *ent, int map[]){
 
 static void moveY(Entity *ent, int map[]){
     ent->remain.y += ent->speed.y;
-    int moveY = arrondir(ent->remain.y);
+    int moveY = arrondir(ent->remain.y); // bon arrondit ????????????????
     if(moveY != 0){
         ent->remain.y -= moveY;
         int moveSign = signInt(moveY); // droite ou gauche
@@ -87,7 +77,7 @@ static void moveY(Entity *ent, int map[]){
                             if(ent->speed.y > 0.0f){ // falling
                                 ent->grounded = true;
                             }
-                            ent->speed.y = 0;
+                            ent->speed.y = 0.0f;
                             ent->remain.y = 0.0f;
                             collisionHappened = true;
                             break;
@@ -111,7 +101,7 @@ bool isWallSliding(Entity *ent, int map[]){
     if (ent->grounded) return false;
     int touchWall = 2;
     if (touchWall < ent->physicsBox.x - blockSize * (int) (ent->physicsBox.x / blockSize) && 
-        touchWall < blockSize * (int) ((ent->physicsBox.x + ent->physicsBox.width) / blockSize) + blockSize - (ent->physicsBox.x + ent->physicsBox.width))
+        touchWall < blockSize * (int) ((ent->physicsBox.x + ent->physicsBox.width) / blockSize) - (ent->physicsBox.x + ent->physicsBox.width))
         return false;
 
     int sideBlock = findBlockMap(*ent, mapSizeX, mapSizeY) + mapSizeY*ent->direction;
@@ -134,8 +124,11 @@ void mouvement(Entity *player, int map[], float dt){
     
     // slide against wall
     wallSliding = isWallSliding(&(*player), map);
-    const char * test = TextFormat("wallSliding = %s", wallSliding?"oui":"non");
-    DrawText(test, 400, 30, 20, BLACK);
+    const char * test0 = TextFormat("%s", wallSliding?"sliding":"");
+    DrawText(test0, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
+
+    const char * test = TextFormat("%s", player->grounded?"grounded":"");
+    DrawText(test, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
 
     // jump
     if(IsKeyPressed(KEY_UP)){
@@ -157,7 +150,7 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     // controler la hauteur du saut en appuyant plus ou moins longtemps
-    if (!IsKeyDown(KEY_UP) && player->speed.y < 0){
+    if (!IsKeyDown(KEY_UP) && player->speed.y < -0.1f){
         player->speed.y = 0;
     }
 
@@ -220,4 +213,8 @@ void mouvement(Entity *player, int map[], float dt){
     
     moveY(&(*player), map);
     updatePhysicsBoxEntity(&(*player));
+    
+    if (player->grounded){
+        player->speed.y = 0;
+    }
 }
