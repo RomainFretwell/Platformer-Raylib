@@ -2,18 +2,32 @@
 
 const float runSpeed = 2.1f; // à 2.0f
 const float runAcceleration = 10.0f;
+
 const float runReduce = 22.0f; 
 const float flyReduce = 12.0f;    
-const float gravity = 13.0f;
-const float fallSpeed = 3.6f;
-const float jumpSpeed = -3.0f;
+
+const float regularGravity = 13.0f;
+float gravity = regularGravity;
+
+const float fallSpeed = 3.8f;
+const float jumpSpeed = -3.3f;
 const float glideSpeed = 0.7f;
 const float wallSlideSpeed = 0.3f;
-const Vector2 wallJumpSpeed = {-3.3f, -2.0f};
+const Vector2 wallJumpSpeed = {-2.3f, -3.0f};
+
 bool wallSliding = false;
 bool canGlide = true;
+
 const double coyoteTime = 0.15;
 double coyoteTimeCounter = coyoteTime;
+
+const double jumpBuffer = 0.1;
+double jumpBufferCounter = jumpBuffer;
+
+const float jumpHangThresh = 0.2f;
+const float hangGravity = regularGravity / 2;
+const float hangBoostThresh = runSpeed * 0.1;
+const float hangBoost = runSpeed * 1.2;
 
 
 static void moveX(Entity *ent, int map[]){
@@ -60,7 +74,7 @@ static void moveX(Entity *ent, int map[]){
 
 static void moveY(Entity *ent, int map[]){
     ent->remain.y += ent->speed.y;
-    int moveY = arrondir(ent->remain.y); // bon arrondit ????????????????
+    int moveY = arrondir(ent->remain.y);
     if(moveY != 0){
         ent->remain.y -= moveY;
         int moveSign = signInt(moveY); // droite ou gauche
@@ -130,16 +144,35 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     // coyote jump
-    if(player->grounded){
+    if(player->grounded || wallSliding){
         coyoteTimeCounter = coyoteTime;
     }
     else {
         coyoteTimeCounter -= dt;
         //player->animationState = PLAYER_ANIM_JUMP;
     }
+
+    if (IsKeyDown(KEY_UP)){
+        jumpBufferCounter = jumpBuffer;
+    }
+    else {
+        jumpBufferCounter -= dt;
+    }
     
+    // glide
+    if (player->grounded || wallSliding){
+        canGlide = false;
+    }
+    else if (!IsKeyDown(KEY_UP) && player->speed.y > 0){
+        canGlide = true;
+    }
+
     // slide against wall
     wallSliding = isWallSliding(&(*player), map);
+
+    if (IsKeyDown(KEY_DOWN)){
+        wallSliding = false;
+    }
     
     const char * test1 = TextFormat("%s", wallSliding?"sliding":"");
     DrawText(test1, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
@@ -150,24 +183,28 @@ void mouvement(Entity *player, int map[], float dt){
     const char * test3 = TextFormat("coyoteTimeCounter = %f", coyoteTimeCounter);
     DrawText(test3, 100*screenRatio, 270*screenRatio, 10*screenRatio, BLACK);
 
+    const char * test4 = TextFormat("jumpBufferCounter = %f", jumpBufferCounter);
+    DrawText(test4, 100*screenRatio, 280*screenRatio, 10*screenRatio, BLACK);
+
     // jump
-    if(IsKeyDown(KEY_UP)){
-        if (coyoteTimeCounter > 0.0){
-            player->speed.y = jumpSpeed;
-            //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
-            //player->speed.y += player->solidSpeed.y;
-            //play_sound("jump");
-            coyoteTimeCounter = 0.0;
-            player->grounded = false;
-        }
-        else if(wallSliding){
-            player->speed.y = wallJumpSpeed.y;
-            player->speed.x = player->direction * wallJumpSpeed.x;
-            //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
-            //player->speed.y += player->solidSpeed.y;
-            //play_sound("jump");
-            player->grounded = false;
-        }
+    if (coyoteTimeCounter > 0.0 && jumpBufferCounter > 0.0 && !wallSliding){
+        player->speed.y = jumpSpeed;
+        //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
+        //player->speed.y += player->solidSpeed.y;
+        //play_sound("jump");
+        coyoteTimeCounter = 0.0;
+        jumpBufferCounter = 0.0;
+        player->grounded = false;
+    }
+    else if(IsKeyPressed(KEY_UP) && wallSliding){
+        player->speed.y = wallJumpSpeed.y;
+        player->speed.x = player->direction * wallJumpSpeed.x;
+        //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
+        //player->speed.y += player->solidSpeed.y;
+        //play_sound("jump");
+        coyoteTimeCounter = 0.0;
+        jumpBufferCounter = 0.0;
+        player->grounded = false;
     }
 
     // controler la hauteur du saut en appuyant plus ou moins longtemps
@@ -186,6 +223,9 @@ void mouvement(Entity *player, int map[], float dt){
         }
         //player->runAnimTime += dt;
         player->speed.x = approach(player->speed.x, -runSpeed, mult * runAcceleration * dt);
+        //if (wallSliding){
+        //    player->speed.x = wallJumpSpeed.x;
+        //}
     }
 
     if (IsKeyDown(KEY_RIGHT)){
@@ -199,6 +239,9 @@ void mouvement(Entity *player, int map[], float dt){
         }
         //player->runAnimTime += dt;
         player->speed.x = approach(player->speed.x, runSpeed, mult * runAcceleration * dt);
+        //if (wallSliding){
+        //    player->speed.x = - wallJumpSpeed.x;
+        //}
     }
 
     // friction
@@ -211,17 +254,25 @@ void mouvement(Entity *player, int map[], float dt){
         }
     }
 
+    // better jump hang (moins de gravité au sommet + boost de vitesse)
+    if (absf(player->speed.y) < jumpHangThresh && !player->grounded){
+        //const char * test5 = TextFormat("jump hang");
+        //DrawText(test5, 200*screenRatio, 200*screenRatio, 10*screenRatio, BLACK);
+        gravity = hangGravity;
+        if (absf(player->speed.x) > hangBoostThresh){
+            player->speed.x = hangBoost * player->direction;
+        }
+    }
+    else {
+        gravity = regularGravity;
+    }
+
     // glide
-    if (player->grounded || wallSliding){
-        canGlide = false;
-    }
-    else if (!IsKeyDown(KEY_UP) && player->speed.y > 0){
-        canGlide = true;
-    }
     if (IsKeyDown(KEY_UP) && canGlide){
         player->speed.y = approach(player->speed.y, glideSpeed, gravity * dt);
         // animation gliding
     }
+
     else if (wallSliding){
         player->speed.y = approach(player->speed.y, wallSlideSpeed, gravity * dt);
         // animation sliding selon direction
