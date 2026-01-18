@@ -18,6 +18,10 @@ int signInt(int x){
     return (x > 0)?1:-1;
 }
 
+float absf(float x){
+    return x>=0?x:-x;
+}
+
 float min(float a, float b){
     return (a<b)?a:b;
 }
