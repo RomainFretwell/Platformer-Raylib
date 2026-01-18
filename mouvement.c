@@ -1,6 +1,6 @@
 #include "mouvement.h"
 
-const float runSpeed = 2.1f; // à 2.0f
+const float runSpeed = 2.1f;
 const float runAcceleration = 10.0f;
 
 const float runReduce = 22.0f; 
@@ -17,6 +17,8 @@ const Vector2 wallJumpSpeed = {-2.5f, -3.0f};
 
 bool wallSliding = false;
 bool canGlide = true;
+
+bool canDoubleJump = false;
 
 const double coyoteTime = 0.15;
 double coyoteTimeCounter = coyoteTime;
@@ -162,6 +164,11 @@ void mouvement(Entity *player, int map[], float dt){
     else {
         jumpBufferCounter -= dt;
     }
+
+    if (canDoubleJump && IsKeyPressed(KEY_UP)){
+        player->speed.y = jumpSpeed;
+        canDoubleJump = false;
+    }
     
     // glide
     if (player->grounded || wallSliding){
@@ -199,6 +206,7 @@ void mouvement(Entity *player, int map[], float dt){
         //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
         //player->speed.y += player->solidSpeed.y;
         //play_sound("jump");
+        canDoubleJump = true;
         coyoteTimeCounter = 0.0;
         jumpBufferCounter = 0.0;
         player->grounded = false;
@@ -212,7 +220,7 @@ void mouvement(Entity *player, int map[], float dt){
 
         noControlTimeCounter = noControlTime;
         
-
+        canDoubleJump = true;
         coyoteTimeCounter = 0.0;
         jumpBufferCounter = 0.0;
         player->grounded = false;
