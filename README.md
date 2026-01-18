@@ -5,6 +5,7 @@ Objectif : faire un platformer dans un style 8 bit médiéval avec une option cr
 
 
 ## TODO
+- bug collision vers le haut -> tremble + tombe pas
 - Changer struct Entity
 - Nettoyer collision.c
 - Nettoyer + Modifier hitbox ou les fonctions hitbox pour avoir qlqch de joli

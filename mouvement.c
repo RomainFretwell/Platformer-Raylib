@@ -12,6 +12,9 @@ const float wallSlideSpeed = 0.3f;
 const Vector2 wallJumpSpeed = {-3.3f, -2.0f};
 bool wallSliding = false;
 bool canGlide = true;
+const double coyoteTime = 0.15;
+double coyoteTimeCounter = coyoteTime;
+
 
 static void moveX(Entity *ent, int map[]){
     ent->remain.x += ent->speed.x;
@@ -126,22 +129,35 @@ void mouvement(Entity *player, int map[], float dt){
         player->direction = -1;
     }
 
+    // coyote jump
+    if(player->grounded){
+        coyoteTimeCounter = coyoteTime;
+    }
+    else {
+        coyoteTimeCounter -= dt;
+        //player->animationState = PLAYER_ANIM_JUMP;
+    }
     
     // slide against wall
     wallSliding = isWallSliding(&(*player), map);
-    const char * test0 = TextFormat("%s", wallSliding?"sliding":"");
-    DrawText(test0, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
+    
+    const char * test1 = TextFormat("%s", wallSliding?"sliding":"");
+    DrawText(test1, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
 
-    const char * test = TextFormat("%s", player->grounded?"grounded":"");
-    DrawText(test, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
+    const char * test2 = TextFormat("%s", player->grounded?"grounded":"");
+    DrawText(test2, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
+
+    const char * test3 = TextFormat("coyoteTimeCounter = %f", coyoteTimeCounter);
+    DrawText(test3, 100*screenRatio, 270*screenRatio, 10*screenRatio, BLACK);
 
     // jump
     if(IsKeyDown(KEY_UP)){
-        if (player->grounded){
+        if (coyoteTimeCounter > 0.0){
             player->speed.y = jumpSpeed;
             //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
             //player->speed.y += player->solidSpeed.y;
             //play_sound("jump");
+            coyoteTimeCounter = 0.0;
             player->grounded = false;
         }
         else if(wallSliding){
@@ -156,13 +172,8 @@ void mouvement(Entity *player, int map[], float dt){
 
     // controler la hauteur du saut en appuyant plus ou moins longtemps
     if (!IsKeyDown(KEY_UP) && player->speed.y < -0.1f){
-        player->speed.y = 0;
+        player->speed.y *= 0.5f;
     }
-
-    if(!player->grounded){
-        //player->animationState = PLAYER_ANIM_JUMP;
-    }
-    
 
     if (IsKeyDown(KEY_LEFT)){
         if (player->grounded){
