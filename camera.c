@@ -21,7 +21,8 @@ void cameraFollow(Camera2D * camera, Entity player){
     camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
 }
 
-void cameraFollow2(Camera2D * camera, Entity player, float dt){
+void cameraFollow2(Camera2D * camera, Entity player){
+    float dt = GetFrameTime();
     float cameraAcceleration = 0.04f;
     float offset = 100;
     float cameraSpeed = 100;

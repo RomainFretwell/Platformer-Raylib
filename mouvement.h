@@ -8,7 +8,8 @@
 #include "structures.h"
 #include "math2.h"
 #include "collision.h"
+#include "time.h"
 
-void mouvement(Entity *player, int map[], float dt);
+void mouvement(Entity *player, int map[]);
 
 #endif // MOUVEMENT_H

@@ -4,7 +4,8 @@ const float runSpeed = 2.1f;
 const float runAcceleration = 10.0f;
 
 const float runReduce = 22.0f; 
-const float flyReduce = 12.0f;    
+const float flyReduce = 15.0f;
+
 
 const float regularGravity = 13.0f;
 float gravity = regularGravity;
@@ -20,15 +21,11 @@ bool canGlide = true;
 
 bool canDoubleJump = false;
 
-const double coyoteTime = 0.15;
-double coyoteTimeCounter = coyoteTime;
+Timer coyoteTimer = {0.15f, 0.15f};
 
-const double jumpBuffer = 0.1;
-double jumpBufferCounter = jumpBuffer;
+Timer jumpBufferTimer = {0.1f, 0.1f};
 
-// no control when wall jump
-const double noControlTime = 0.1;
-double noControlTimeCounter = noControlTime;
+Timer noControlWallJumpTimer = {0.1f, 0.1f};
 
 const float jumpHangThresh = 0.2f;
 const float hangGravity = regularGravity / 2;
@@ -139,8 +136,10 @@ bool isWallSliding(Entity *player, int map[]){
     return false;
 }
 
-void mouvement(Entity *player, int map[], float dt){
-
+void mouvement(Entity *player, int map[]){
+    
+    float dt = GetFrameTime();
+    
     // regarde la bonne direction
     if (player->speed.x > 0){
         player->direction = 1;
@@ -151,18 +150,18 @@ void mouvement(Entity *player, int map[], float dt){
 
     // coyote jump
     if(player->grounded || wallSliding){
-        coyoteTimeCounter = coyoteTime;
+        startTimer(&coyoteTimer);
     }
     else {
-        coyoteTimeCounter -= dt;
+        updateTimer(&coyoteTimer);
         //player->animationState = PLAYER_ANIM_JUMP;
     }
 
     if (IsKeyDown(KEY_UP)){
-        jumpBufferCounter = jumpBuffer;
+        startTimer(&jumpBufferTimer);
     }
     else {
-        jumpBufferCounter -= dt;
+        updateTimer(&jumpBufferTimer);
     }
 
     if (canDoubleJump && IsKeyPressed(KEY_UP)){
@@ -191,24 +190,24 @@ void mouvement(Entity *player, int map[], float dt){
     const char * test2 = TextFormat("%s", player->grounded?"grounded":"");
     DrawText(test2, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
 
-    const char * test3 = TextFormat("coyoteTimeCounter = %f", coyoteTimeCounter);
+    const char * test3 = TextFormat("coyoteTimer = %f", coyoteTimer.timeleft);
     DrawText(test3, 100*screenRatio, 270*screenRatio, 10*screenRatio, BLACK);
 
-    const char * test4 = TextFormat("jumpBufferCounter = %f", jumpBufferCounter);
+    const char * test4 = TextFormat("jumpBufferTimer = %f", jumpBufferTimer.timeleft);
     DrawText(test4, 100*screenRatio, 280*screenRatio, 10*screenRatio, BLACK);
 
-    const char * test6 = TextFormat("noControlTimeCounter = %f", noControlTimeCounter);
+    const char * test6 = TextFormat("noControlWallJumpTimer = %f", noControlWallJumpTimer.timeleft);
     DrawText(test6, 200*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
 
     // JUMP
-    if (coyoteTimeCounter > 0.0 && jumpBufferCounter > 0.0 && !wallSliding){
+    if (!timerIsDone(&coyoteTimer) && !timerIsDone(&jumpBufferTimer) && !wallSliding){
         player->speed.y = jumpSpeed;
         //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
         //player->speed.y += player->solidSpeed.y;
         //play_sound("jump");
         canDoubleJump = true;
-        coyoteTimeCounter = 0.0;
-        jumpBufferCounter = 0.0;
+        endTimer(&coyoteTimer);
+        endTimer(&jumpBufferTimer);
         player->grounded = false;
     }
     else if(IsKeyPressed(KEY_UP) && wallSliding){
@@ -218,23 +217,21 @@ void mouvement(Entity *player, int map[], float dt){
         //player->speed.y += player->solidSpeed.y;
         //play_sound("jump");
 
-        noControlTimeCounter = noControlTime;
+        startTimer(&noControlWallJumpTimer);
         
         canDoubleJump = true;
-        coyoteTimeCounter = 0.0;
-        jumpBufferCounter = 0.0;
+        endTimer(&jumpBufferTimer);
         player->grounded = false;
     }
 
-    noControlTimeCounter -= dt;
+    updateTimer(&noControlWallJumpTimer);
 
     // controler la hauteur du saut en appuyant plus ou moins longtemps
     if (!IsKeyDown(KEY_UP) && player->speed.y < -0.1f){
         player->speed.y *= 0.5f;
     }
 
-    if (IsKeyDown(KEY_LEFT) && noControlTimeCounter < 0.0){
-        noControlTimeCounter = -0.1;
+    if (IsKeyDown(KEY_LEFT) && timerIsDone(&noControlWallJumpTimer)){
         
         if (player->grounded){
             //player->animationState = PLAYER_ANIM_JUMP;
@@ -248,9 +245,8 @@ void mouvement(Entity *player, int map[], float dt){
         player->speed.x = approach(player->speed.x, -runSpeed, mult * runAcceleration * dt);
     }
 
-    if (IsKeyDown(KEY_RIGHT) && noControlTimeCounter < 0.0){
-        noControlTimeCounter = 0.0;
-        
+    if (IsKeyDown(KEY_RIGHT) && timerIsDone(&noControlWallJumpTimer)){
+
         if (player->grounded){
             //player->animationState = PLAYER_ANIM_JUMP;
         }
@@ -264,7 +260,7 @@ void mouvement(Entity *player, int map[], float dt){
     }
 
     // friction
-    if(!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && noControlTimeCounter < 0.0){
+    if(!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && timerIsDone(&noControlWallJumpTimer)){
         if(player->grounded){
             player->speed.x = approach(player->speed.x, 0, runReduce * dt);
         }

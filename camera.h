@@ -10,7 +10,7 @@
 
 void limitCameraMap(Camera2D * camera);
 void cameraFollow(Camera2D * camera, Entity player);
-void cameraFollow2(Camera2D * camera, Entity player, float dt);
+void cameraFollow2(Camera2D * camera, Entity player);
 void limitCameraFollow(Camera2D * camera, Entity player, int cameraFollowThresh);
 void shakeCamera(Camera2D * camera, float intensity, float duration);
 

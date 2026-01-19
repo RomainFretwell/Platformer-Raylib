@@ -82,6 +82,13 @@ void initializeMap(int map[]){
         map[24*mapSizeY + y] = 4;
         map[32*mapSizeY + y] = 4;
     }
+
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 6; j++){
+            map[(50+i+8*j)*mapSizeY + mapSizeY-12 - 4*j] = 4;
+            map[(50+i+8*j)*mapSizeY + 26 + 4*j] = 4;
+        }
+    }
         
 }
 
@@ -208,8 +215,6 @@ int main(){
     };
     
     // time variables
-    double frameStart;
-    double frameEnd;
     double deltaTime = 0.005;
 
     int maxFPS = 200;
@@ -221,9 +226,7 @@ int main(){
 // ----------------------------------------------------------------------------------------
 
     while (!WindowShouldClose()){
-        
-        frameStart = GetTime();
-        
+
         // Toggle fullscreen
         if (IsKeyPressed(KEY_F11)){
             ToggleFullscreenWindow();
@@ -238,7 +241,7 @@ int main(){
             showEntityHitbox = !showEntityHitbox;
         }
         
-        mouvement(&player, map, deltaTime);
+        mouvement(&player, map);
         updatePhysicsBoxEntity(&player);
 
 // ----------------------------------------------------------------------------------------
@@ -364,7 +367,7 @@ int main(){
         //camera.target.y = approach(camera.target.y, (player.position.y + aheadAmount * player.speed.y * deltaTime) * screenRatio, smoothSpeed*deltaTime); // sans dt ??
         if (!IsKeyDown(KEY_X)){
             cameraFollow(&camera, player);
-            //cameraFollow2(&camera, player, deltaTime);
+            //cameraFollow2(&camera, player);
             int cameraFollowThresh = 120;
             limitCameraFollow(&camera, player, cameraFollowThresh);
         }
@@ -463,8 +466,7 @@ int main(){
         
         EndDrawing();
 
-        frameEnd = GetTime();
-        deltaTime = frameEnd - frameStart;
+        deltaTime = GetFrameTime();
     }
     
     UnloadTexture(air.texture);
