@@ -54,11 +54,13 @@ typedef struct structEntity {
     
     float angle;
     int direction;
+    
+    Hitbox hitbox; // pour collisions avec entity
+    IntRectangle physicsBox; // pour collisions avec map
+    
+    IntVector2 origin;
     Texture2D texture;
     int animationState; // idle + walking + runing/dashing + jumping + dying + ... = choix en vertical sur la texture atlas
-    
-    IntRectangle physicsBox; // pour collisions avec map
-    Hitbox hitbox; // pour collisions avec entity
     
     Vector2 remain;
     bool grounded;

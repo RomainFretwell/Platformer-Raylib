@@ -6,8 +6,6 @@ void drawCross(int x, int y, Color color){
 }
 
 void drawBlock(int x, int y, Block block){
-    //int x = i / mapSizeY;
-    //int y = i % mapSizeY;
     DrawTextureEx(block.texture, (Vector2){x*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio}, 0, sizeCoef*screenRatio, WHITE);
 }
 
@@ -54,19 +52,22 @@ void drawHitbox(Hitbox hitbox, Color color){
     DrawLine(screenRatio*hitbox.A.x, screenRatio*hitbox.A.y, screenRatio*hitbox.D.x, screenRatio*hitbox.D.y, color);
 }
 
-void drawEntity(Entity ent){ // part du principe que (x,y) est le centre de la hitbox (et pas le coin en haut à gauche)
-    int size = 1;
-    DrawTexturePro(
-        ent.texture,
-        (Rectangle) {0, 0, ent.direction * ent.texture.width, ent.texture.height}, // source
-        (Rectangle) {ent.position.x*screenRatio,
-                    ent.position.y*screenRatio, // ent.texture.height + ent.hitbox.topOffset - ent.hitbox.bottomOffset)/2
-                    size*ent.texture.width*screenRatio,
-                    size*ent.texture.height*screenRatio}, // dest
-        (Vector2)   {(ent.texture.width + ent.direction*(ent.hitbox.leftOffset - ent.hitbox.rightOffset))/2 * screenRatio, 
-                    (ent.texture.height + ent.hitbox.topOffset - ent.hitbox.bottomOffset)/2 * screenRatio}, // origin
-        ent.angle,
-        WHITE);
+void drawEntity(Entity ent){
+    // part du principe que la position (x,y) est le centre de la physicsBox (et pas le coin en haut à gauche)
+    Rectangle source = (Rectangle) {0, 0, ent.direction * ent.texture.width, ent.texture.height};
+    
+    Rectangle dest;
+    dest.x = ent.position.x * screenRatio;
+    dest.y = ent.position.y * screenRatio;
+    dest.width = ent.texture.width * screenRatio;
+    dest.height = ent.texture.height * screenRatio;
+
+    Vector2 origin;
+    if (ent.direction == 1) origin.x = ent.origin.x * screenRatio;
+    else if (ent.direction == -1) origin.x = (ent.texture.width - ent.origin.x) * screenRatio;
+    origin.y = ent.origin.y * screenRatio;
+    
+    DrawTexturePro(ent.texture, source, dest, origin, ent.angle, WHITE);
 }
 
 void drawItem(Item item){
