@@ -92,7 +92,6 @@ int main(){
     player.VxMax = 5.0f;
     player.VyMax = 10.0f;
     player.speed = (Vector2){0.0f, 0.0f};
-    player.acceleration = (Vector2){0.0f, gravity};
     player.angle = 0.0f;
     player.direction = 1;
     player.texture = LoadTexture("resources/druid.png");
@@ -101,11 +100,12 @@ int main(){
     player.hitbox.leftOffset = 8;
     player.hitbox.rightOffset = 4;
     updateHitboxEntity(&player);
+
+    player.origin = (IntVector2){18, 18};
     player.physicsBox.width = 22;
     player.physicsBox.height = 24;
     player.physicsBox.x = player.position.x - player.physicsBox.width/2;
     player.physicsBox.y = player.position.y - player.physicsBox.height/2;
-    
     player.remain = (Vector2){0.0f,0.0f};
     player.grounded = false;
     
@@ -141,8 +141,26 @@ int main(){
     
     // autres variables
     float testAngleArc = 1.0f;
-    bool showCross = true; // pour dessinà supprimer 
+    bool showCross = false; // pour dessinà supprimer
+    bool showDebugInfo = false;
 
+    // slime
+    Entity slime;
+    slime.texture = LoadTexture("resources/green_slime_idle.png");
+    slime.position = (IntVector2){330, 180};
+    slime.speed = (Vector2){0.0f, 0.0f};
+    slime.angle = 0.0f;
+    slime.direction = 1;
+
+    slime.origin = (IntVector2){8, 9};
+    slime.physicsBox.width = 14;
+    slime.physicsBox.height = 8;
+    slime.physicsBox.x = player.position.x - player.physicsBox.width/2;
+    slime.physicsBox.y = player.position.y - player.physicsBox.height/2;
+    slime.remain = (Vector2){0.0f,0.0f};
+    slime.grounded = false;
+    
+    
     // camera
     Camera2D camera = {
         .target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio},
@@ -177,7 +195,10 @@ int main(){
             showBlockHitbox = !showBlockHitbox;
             showEntityHitbox = !showEntityHitbox;
         }
-        
+        if (IsKeyPressed(KEY_T)){
+            showDebugInfo = !showDebugInfo;
+        }
+
         mouvement(&player, map);
         updatePhysicsBoxEntity(&player);
 
@@ -327,6 +348,7 @@ int main(){
         drawEntity(player);
         drawEntity(bow);
         drawEntity(arrow);
+        //drawEntity(slime);
         
         if (showEntityHitbox){
             drawHitbox(player.hitbox, RED);
@@ -363,25 +385,26 @@ int main(){
             DrawText(test0, currentScreenSize.x - 180, 10, 20, RED);
         }
 
-        DrawFPS(10, 10);
-        const char * test = TextFormat("Frame time = %f", deltaTime);
-        DrawText(test, 10, 30, 20, BLACK);
-        
-        
         // test player
-        const char * test1 = TextFormat("World position X = %d", player.position.x);
-        DrawText(test1, 10, 50, 20, BLACK);
-        const char * test2 = TextFormat("World position Y = %d", player.position.y);
-        DrawText(test2, 10, 70, 20, BLACK);
-        Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
-        const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
-        DrawText(test01, 10, 90, 20, BLACK);
-        const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
-        DrawText(test02, 10, 110, 20, BLACK);
-        const char * test3 = TextFormat("speed X = %f", player.speed.x);
-        DrawText(test3, 10, 130, 20, BLACK);
-        const char * test4 = TextFormat("speed Y = %f", player.speed.y);
-        DrawText(test4, 10, 150, 20, BLACK);
+        if (showDebugInfo){
+            DrawFPS(10, 10);
+            const char * test = TextFormat("Frame time = %f", deltaTime);
+            DrawText(test, 10, 30, 20, BLACK);
+            const char * test1 = TextFormat("World position X = %d", player.position.x);
+            DrawText(test1, 10, 50, 20, BLACK);
+            const char * test2 = TextFormat("World position Y = %d", player.position.y);
+            DrawText(test2, 10, 70, 20, BLACK);
+            Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
+            const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
+            DrawText(test01, 10, 90, 20, BLACK);
+            const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
+            DrawText(test02, 10, 110, 20, BLACK);
+            const char * test3 = TextFormat("speed X = %f", player.speed.x);
+            DrawText(test3, 10, 130, 20, BLACK);
+            const char * test4 = TextFormat("speed Y = %f", player.speed.y);
+            DrawText(test4, 10, 150, 20, BLACK);
+        }
+        
         
 
         /* test arrow
@@ -414,6 +437,7 @@ int main(){
     UnloadTexture(player.texture);
     UnloadTexture(bow.texture);
     UnloadTexture(arrow.texture);
+    UnloadTexture(slime.texture);
 
     CloseWindow();
 
