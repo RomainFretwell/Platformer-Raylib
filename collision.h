@@ -9,16 +9,14 @@
 #include "math2.h"
 #include "draw.h" // à enlever après ?
 
-bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2);
-void rectToPoints(Hitbox *hitbox);
 bool rectangleCollision(IntRectangle a, IntRectangle b);
-bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2);
-void updateHitboxEntity(Entity *ent);
-void updateHitboxItem(Item *item);
-void updatePhysicsBoxEntity(Entity *ent);
-void indexToHitbox(int index, Hitbox *hitbox);
 void indexToIntRectangle(int index, IntRectangle *rect);
-void handleBlockCollisions(Entity * ent, int map[]);
 int findBlockMap(Entity ent, int mapSizeX, int mapSizeY); // à enlever ?
+void updatePhysicsBoxEntity(Entity *ent);
+
+bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2);
+bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2);
+void rectToPoints(Hitbox *hitbox);
+void updateHitboxEntity(Entity *ent);
 
 #endif // COLLISION_H
