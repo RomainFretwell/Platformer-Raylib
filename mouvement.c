@@ -130,6 +130,9 @@ bool isWallSliding(Entity *player, int map[]){
     if (map[sideBlock + mapSizeY + 1] != 0 || map[sideBlock - 2*mapSizeY*player->direction + 1] != 0){
         return false;
     }
+    if (!(IsKeyDown(KEY_RIGHT) && player->direction == RIGHT) && !(IsKeyDown(KEY_LEFT) && player->direction == LEFT)){
+        return false;
+    } 
     if (map[sideBlock-1] != 0 || map[sideBlock] != 0 || map[sideBlock+1] != 0){
         return true;
     }
@@ -156,6 +159,9 @@ void mouvement(Entity *player, int map[]){
         updateTimer(&coyoteTimer);
         //player->animationState = PLAYER_ANIM_JUMP;
     }
+    if (player->grounded){
+        canDoubleJump = true;
+    }
 
     if (IsKeyDown(KEY_UP)){
         startTimer(&jumpBufferTimer);
@@ -164,7 +170,7 @@ void mouvement(Entity *player, int map[]){
         updateTimer(&jumpBufferTimer);
     }
 
-    if (canDoubleJump && IsKeyPressed(KEY_UP)){
+    if (canDoubleJump && IsKeyPressed(KEY_UP) && !player->grounded && !wallSliding){
         player->speed.y = jumpSpeed;
         canDoubleJump = false;
     }
@@ -179,10 +185,6 @@ void mouvement(Entity *player, int map[]){
 
     // slide against wall
     wallSliding = isWallSliding(&(*player), map);
-
-    if (IsKeyDown(KEY_DOWN)){
-        wallSliding = false;
-    }
     
     const char * test1 = TextFormat("%s", wallSliding?"sliding":"");
     DrawText(test1, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
@@ -205,7 +207,6 @@ void mouvement(Entity *player, int map[]){
         //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
         //player->speed.y += player->solidSpeed.y;
         //play_sound("jump");
-        canDoubleJump = true;
         endTimer(&coyoteTimer);
         endTimer(&jumpBufferTimer);
         player->grounded = false;
@@ -219,7 +220,6 @@ void mouvement(Entity *player, int map[]){
 
         startTimer(&noControlWallJumpTimer);
         
-        canDoubleJump = true;
         endTimer(&jumpBufferTimer);
         player->grounded = false;
     }
