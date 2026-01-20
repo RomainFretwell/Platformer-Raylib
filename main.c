@@ -48,31 +48,36 @@ int main(){
     screenRatio = 1.0f;
     
     // Load block textures
-    Block air;
-    air.texture = LoadTexture("resources/air.png"); // transparent texture
-    air.solid = false;
-    air.breakable = false;
-    air.coefRebond = 0.0f;
-    Block dirt;
-    dirt.texture = LoadTexture("resources/dirt.png");
-    dirt.solid = true;
-    dirt.breakable = true;
-    dirt.coefRebond = 0.0f;
-    Block grass;
-    grass.texture = LoadTexture("resources/grass.png");
-    grass.solid = true;
-    grass.breakable = true;
-    grass.coefRebond = 0.0f;
-    Block stone;
-    stone.texture = LoadTexture("resources/stone.png");
-    stone.solid = true;
-    stone.breakable = true;
-    stone.coefRebond = 0.0f;
-    Block gravel;
-    gravel.texture = LoadTexture("resources/gravel.png");
-    gravel.solid = true;
-    gravel.breakable = true;
-    gravel.coefRebond = 0.0f;
+    Block air = {
+        .texture = LoadTexture("resources/air.png"), // transparent texture
+        .solid = false,
+        .breakable = false,
+        .coefRebond = 0.0f
+    };
+    Block dirt = {
+        .texture = LoadTexture("resources/dirt.png"),
+        .solid = true,
+        .breakable = true,
+        .coefRebond = 0.0f
+    };
+    Block grass = {
+        .texture = LoadTexture("resources/grass.png"),
+        .solid = true,
+        .breakable = true,
+        .coefRebond = 0.0f
+    };
+    Block stone = {
+        .texture = LoadTexture("resources/stone.png"),
+        .solid = true,
+        .breakable = true,
+        .coefRebond = 0.0f
+    };
+    Block gravel = {
+        .texture = LoadTexture("resources/gravel.png"),
+        .solid = true,
+        .breakable = true,
+        .coefRebond = 0.0f
+    };
 
     Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
 
@@ -135,15 +140,6 @@ int main(){
         .animation.origin = (IntVector2){2, 14},
     };
     
-    // autres variables
-    int fireSpeed = 10;
-    float VabsMax = 50.0f;
-    bool grabbed = true;
-    float testAngleArc = 1.0f;
-    float acceleration = gravity;
-    bool showCross = false; // pour dessinà supprimer
-    bool showDebugInfo = false;
-
     // slime
     Entity slime = (Entity){
         .texture = LoadTexture("resources/green_slime_idle.png"),
@@ -180,12 +176,19 @@ int main(){
         .zoom = 1
     };
     
+    // autres variables
+    int fireSpeed = 10;
+    float VabsMax = 50.0f;
+    bool grabbed = true;
+    float testAngleArc = 1.0f;
+    float acceleration = gravity;
+    bool showCross = false; // pour dessinà supprimer
+    bool showDebugInfo = false;
+
     // time variables
     double deltaTime = 0.005;
-
     int maxFPS = 200;
     SetTargetFPS(maxFPS);
-
 
     // ----------------------------------------------------------------------------------------
     //                                   Game loop
@@ -208,6 +211,9 @@ int main(){
         }
         if (IsKeyPressed(KEY_T)){
             showDebugInfo = !showDebugInfo;
+        }
+        if (IsKeyPressed(KEY_C)){
+            showCross = !showCross;
         }
 
         mouvement(&player, map);
@@ -332,10 +338,6 @@ int main(){
 
         BeginMode2D(camera);
 
-        //float aheadAmount = 5000;
-        //float smoothSpeed = 500;
-        //camera.target.x = approach(camera.target.x, (player.position.x + aheadAmount * player.speed.x * deltaTime) * screenRatio, smoothSpeed*deltaTime); // sans dt ??
-        //camera.target.y = approach(camera.target.y, (player.position.y + aheadAmount * player.speed.y * deltaTime) * screenRatio, smoothSpeed*deltaTime); // sans dt ??
         if (!IsKeyDown(KEY_X)){
             cameraFollow(&camera, player);
             //cameraFollow2(&camera, player);
@@ -378,15 +380,8 @@ int main(){
         }
 
         // test croix player
-        if (IsKeyPressed(KEY_C)){
-            showCross = !showCross;
-        }
         if (showCross){
             drawCross(player.position.x, player.position.y, BLACK);
-        }
-
-        if (IsKeyDown(KEY_SPACE)){
-            player.position.y = 150;
         }
 
         EndMode2D();
@@ -404,8 +399,6 @@ int main(){
         // test player
         if (showDebugInfo){
             DrawFPS(10, 10);
-            const char * test = TextFormat("Frame time = %f", deltaTime);
-            DrawText(test, 10, 30, 20, BLACK);
             const char * test1 = TextFormat("World position X = %d", player.position.x);
             DrawText(test1, 10, 50, 20, BLACK);
             const char * test2 = TextFormat("World position Y = %d", player.position.y);
@@ -456,8 +449,6 @@ int main(){
     UnloadTexture(slime.texture);
 
     CloseWindow();
-
-    // sauvegarde
 
     return 0;
 }

@@ -10,8 +10,5 @@ Objectif : faire un platformer dans un style 8 bit médiéval avec une option cr
 - on multiplie position par screenRatio donc on bouge de 3 pixels à chaque fois en grand écran (même si pas le vrai problème car on peut aussi voir sacadé en petit écran)
 
 ## TODO
-- Changer struct Entity
-- Nettoyer collision.c
-- Nettoyer + Modifier hitbox ou les fonctions hitbox pour avoir qlqch de joli
-- NETTOYER LE MAIN + mettre des trucs dans des .c et .h
+- Dessiner des animations + faire tableau d'animation avec comme index : AnimationState animState
 - Modifier structure map/world pour en avoir plusieurs mais de différentes tailles
