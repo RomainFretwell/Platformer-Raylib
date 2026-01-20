@@ -3,9 +3,10 @@
 #include "raylib.h"
 #include "structures.h"
 #include "constants.h"
+#include "math2.h"
 #include "map.h"
 #include "draw.h"
-#include "math2.h"
+#include "animation.h"
 #include "camera.h"
 #include "collision.h"
 #include "mouvement.h"
@@ -87,80 +88,90 @@ int main(){
     float gravity = 13.0f; //0.3f
 
     // player initialization
-    Entity player;
-    player.position = (IntVector2){350, 150};
-    player.VxMax = 5.0f;
-    player.VyMax = 10.0f;
-    player.speed = (Vector2){0.0f, 0.0f};
-    player.angle = 0.0f;
-    player.direction = 1;
-    player.texture = LoadTexture("resources/druid.png");
-    player.hitbox.bottomOffset = 2;
-    player.hitbox.topOffset = 6;
-    player.hitbox.leftOffset = 8;
-    player.hitbox.rightOffset = 4;
-    updateHitboxEntity(&player);
+    Entity player = (Entity){
+        .position = (IntVector2){350, 150},
+        .speed = (Vector2){0.0f, 0.0f},
+        .angle = 0.0f,
+        .direction = RIGHT,
+        .texture = LoadTexture("resources/druid.png"),
 
-    player.origin = (IntVector2){18, 18};
-    player.physicsBox.width = 22;
-    player.physicsBox.height = 24;
-    player.physicsBox.x = player.position.x - player.physicsBox.width/2;
-    player.physicsBox.y = player.position.y - player.physicsBox.height/2;
-    player.remain = (Vector2){0.0f,0.0f};
-    player.grounded = false;
+        // physics box
+        .physicsBox.width = 22,
+        .physicsBox.height = 24,
+        .physicsBox.x = player.position.x - player.physicsBox.width/2,
+        .physicsBox.y = player.position.y - player.physicsBox.height/2,
+        .remain = (Vector2){0.0f,0.0f},
+        .grounded = false,
+
+        // animation
+        .animState = IDLE,
+        .animation.type = REPEATING,
+        .animation.first = 0,
+        .animation.last = 0, // nbFrames - 1
+        .animation.current = player.animation.first,
+        .animation.step = 1,
+        .animation.frameSize = (IntVector2){32, 32},
+        .animation.origin = (IntVector2){18, 18},
+        .animation.timer = (Timer){0.1f, 0},
+    };
     
     // bow
-    Entity bow;
-    bow.texture = LoadTexture("resources/bow.png");
-    bow.hitbox.bottomOffset = 0;
-    bow.hitbox.topOffset = 0;
-    bow.hitbox.leftOffset = 0;
-    bow.hitbox.rightOffset = 0;
-    bow.position = (IntVector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2};
-    bow.speed = player.speed;
-    bow.acceleration = player.acceleration;
-    bow.angle = 135.0f;
-    bow.direction = 1;
-    updateHitboxEntity(&bow);
-
-    Entity arrow;
-    arrow.position =  bow.position; // à changer à player.position
-    arrow.speed = player.speed;
-    arrow.acceleration = player.acceleration; // pas de gravité si pas tirée
-    int fireSpeed = 10;
-    arrow.VabsMax = 50.0f;
-    arrow.angle = 0.0f;
-    arrow.direction = 1;
-    arrow.grabbed = true;
-    arrow.texture = LoadTexture("resources/arrow.png");
-    arrow.hitbox.bottomOffset = 0;
-    arrow.hitbox.topOffset = 0;
-    arrow.hitbox.leftOffset = 0;
-    arrow.hitbox.rightOffset = 0;
-    updateHitboxEntity(&arrow);
+    Entity bow = (Entity){
+        .texture = LoadTexture("resources/bow.png"),
+        .position = (IntVector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2},
+        .speed = player.speed,
+        .angle = 135.0f,
+        .direction = RIGHT,
+        .animation.origin = (IntVector2){12, 12},
+    };
+    
+    // arrow
+    Entity arrow = (Entity){
+        .position =  bow.position, // à changer à player.position
+        .speed = player.speed,
+        .angle = 0.0f,
+        .direction = RIGHT,
+        .texture = LoadTexture("resources/arrow.png"),
+        .animation.origin = (IntVector2){2, 14},
+    };
     
     // autres variables
+    int fireSpeed = 10;
+    float VabsMax = 50.0f;
+    bool grabbed = true;
     float testAngleArc = 1.0f;
+    float acceleration = gravity;
     bool showCross = false; // pour dessinà supprimer
     bool showDebugInfo = false;
 
     // slime
-    Entity slime;
-    slime.texture = LoadTexture("resources/green_slime_idle.png");
-    slime.position = (IntVector2){330, 180};
-    slime.speed = (Vector2){0.0f, 0.0f};
-    slime.angle = 0.0f;
-    slime.direction = 1;
+    Entity slime = (Entity){
+        .texture = LoadTexture("resources/green_slime_idle.png"),
+        .position = (IntVector2){330, 180},
+        .speed = (Vector2){0.0f, 0.0f},
+        .angle = 0.0f,
+        .direction = LEFT,
 
-    slime.origin = (IntVector2){8, 9};
-    slime.physicsBox.width = 14;
-    slime.physicsBox.height = 8;
-    slime.physicsBox.x = player.position.x - player.physicsBox.width/2;
-    slime.physicsBox.y = player.position.y - player.physicsBox.height/2;
-    slime.remain = (Vector2){0.0f,0.0f};
-    slime.grounded = false;
-    
-    
+        // physics box
+        .physicsBox.width = 14,
+        .physicsBox.height = 8,
+        .physicsBox.x = player.position.x - player.physicsBox.width/2,
+        .physicsBox.y = player.position.y - player.physicsBox.height/2,
+        .remain = (Vector2){0.0f,0.0f},
+        .grounded = false,
+        
+        // animation
+        .animState = IDLE,
+        .animation.type = REPEATING,
+        .animation.first = 0,
+        .animation.last = 5, // nbFrames - 1
+        .animation.current = slime.animation.first,
+        .animation.step = 1,
+        .animation.frameSize = (IntVector2){16, 16},
+        .animation.origin = (IntVector2){8, 9},
+        .animation.timer = (Timer){0.15f, 0.0f},
+    };
+
     // camera
     Camera2D camera = {
         .target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio},
@@ -176,9 +187,9 @@ int main(){
     SetTargetFPS(maxFPS);
 
 
-// ----------------------------------------------------------------------------------------
-//                                   Game loop
-// ----------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    //                                   Game loop
+    // ----------------------------------------------------------------------------------------
 
     while (!WindowShouldClose()){
 
@@ -202,9 +213,9 @@ int main(){
         mouvement(&player, map);
         updatePhysicsBoxEntity(&player);
 
-// ----------------------------------------------------------------------------------------
-//                                   Arrow
-// ----------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------
+        //                                   Arrow
+        // ----------------------------------------------------------------------------------------
 
         // test arc et flèche qui tourne
         testAngleArc = 0.1;
@@ -213,28 +224,25 @@ int main(){
         // grab arrow
         // TODO : changer distance arrow-player (pas arrow-arrow pour test)
         if (IsKeyPressed(KEY_E) && distance(arrow.position, arrow.position) < 50){
-            arrow.grabbed = !arrow.grabbed;
+            grabbed = !grabbed;
 
             arrow.position = bow.position; // à modifier car décalage
             arrow.angle = bow.angle - 135;
-            arrow.acceleration.x = 0;
-            arrow.acceleration.y = gravity;
+            acceleration = gravity;
             arrow.speed = bow.speed;
         }
 
-        if (arrow.grabbed){
+        if (grabbed){
             if (IsKeyPressed(KEY_Q)){ // clavier en qwerty ????
-                arrow.grabbed = false;
+                grabbed = false;
 
                 arrow.position = bow.position; // à modifier car décalage
                 arrow.angle = bow.angle - 135;
-                arrow.acceleration.x = 0;
-                arrow.acceleration.y = gravity;
+                acceleration = gravity;
                 arrow.speed.x = fireSpeed * cosf(arrow.angle * PI/180);
                 arrow.speed.y = fireSpeed * sinf(arrow.angle * PI/180);
             }
             else {
-                arrow.acceleration = bow.acceleration;
                 arrow.speed = bow.speed;
                 arrow.position = bow.position; // à modifier car décalage
                 arrow.angle = bow.angle - 135;
@@ -244,12 +252,12 @@ int main(){
         else {          
             
             // gravité flèche
-            arrow.speed.y += arrow.acceleration.y * deltaTime;
+            arrow.speed.y += acceleration * deltaTime;
         
             // limite vitesse flèche
-            if (distanceFloat(arrow.speed, (Vector2) {0.0f, 0.0f}) > arrow.VabsMax) {
-                arrow.speed.x = arrow.VabsMax * cosf(arrow.angle * PI / 180);
-                arrow.speed.y = arrow.VabsMax * sinf(arrow.angle * PI / 180);
+            if (distanceFloat(arrow.speed, (Vector2) {0.0f, 0.0f}) > VabsMax) {
+                arrow.speed.x = VabsMax * cosf(arrow.angle * PI / 180);
+                arrow.speed.y = VabsMax * sinf(arrow.angle * PI / 180);
             }
             
             // si collion avec block alors speed = 0 et acceleration = 0
@@ -286,23 +294,28 @@ int main(){
                 // arrow.position.y = currentScreenSize.y/screenRatio - 30;
                 arrow.speed.x = 0.0f;
                 arrow.speed.y = 0.0f;
-                arrow.acceleration.x = 0.0f;
-                arrow.acceleration.y = 0.0f;
+                acceleration = 0.0f;
             }
         }
         
-// ----------------------------------------------------------------------------------------
-//                             update hitboxes
-// ----------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------
+        //                             update hitboxes
+        // ----------------------------------------------------------------------------------------
 
         updateHitboxEntity(&player);
         updateHitboxEntity(&bow);
         updateHitboxEntity(&arrow);
 
+        // ----------------------------------------------------------------------------------------
+        //                             update animations
+        // ----------------------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------------------
-//                                   Drawing
-// ----------------------------------------------------------------------------------------
+        updateAnimation(&slime.animation);
+
+
+        // ----------------------------------------------------------------------------------------
+        //                                   Drawing
+        // ----------------------------------------------------------------------------------------
         BeginDrawing();
         
         ClearBackground(background_color);
@@ -344,11 +357,14 @@ int main(){
         }
         */
         
+
         // affichage des entity (dans le bon ordre)
-        drawEntity(player);
-        drawEntity(bow);
-        drawEntity(arrow);
-        //drawEntity(slime);
+
+        //drawEntity(player);
+        //drawEntity(bow);
+        //drawEntity(arrow);
+        drawEntity(slime);
+
         
         if (showEntityHitbox){
             drawHitbox(player.hitbox, RED);
@@ -376,9 +392,9 @@ int main(){
         EndMode2D();
 
 
-// ----------------------------------------------------------------------------------------
-//                                 DEBUG INFO
-// ----------------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------------
+        //                                 DEBUG INFO
+        // ----------------------------------------------------------------------------------------
 
         if (showEntityHitbox){
             const char * test0 = TextFormat("entity hitbox ON");

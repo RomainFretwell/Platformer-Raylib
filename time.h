@@ -2,13 +2,8 @@
 #define TIME_H
 
 #include <stdio.h>
-//#include <stdlib.h>
 #include "raylib.h"
-
-typedef struct{
-    float lifetime;
-    float timeleft;
-} Timer;
+#include "structures.h"
 
 void startTimer(Timer* timer);
 void endTimer(Timer* timer);

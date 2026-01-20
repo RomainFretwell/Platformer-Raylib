@@ -3,31 +3,31 @@
 
 #include "raylib.h"
 
-typedef struct structIntVector2 {
+
+// IntVector2
+typedef struct {
     int x;
     int y;
 } IntVector2;
 
-typedef struct structIntRectangle {
+
+// IntRectangle
+typedef struct {
     int x;
     int y;
     int width;
     int height;
 } IntRectangle;
 
+
+// Hitbox
 // renomer type Hitbox en OrientedRectangle, RotatedRectangle ou autre chose
-typedef struct structHitbox {
+typedef struct {
     float x;
     float y;
     float width;
     float height;
     float angle;
-
-    // hitbox offset à modifier ?
-    float bottomOffset;
-    float topOffset;
-    float leftOffset;
-    float rightOffset;
 
     // autre representation d'un rectangle ABCD avec 4 points
     Vector2 A;
@@ -36,15 +36,58 @@ typedef struct structHitbox {
     Vector2 D;
 } Hitbox; // rectangle with rotation
 
-typedef struct structEntity {
+
+// Direction
+typedef enum {
+    LEFT = -1,
+    RIGHT = 1
+} Direction;
+
+
+// AnimationType
+typedef enum {
+    REPEATING = 0,
+    ONESHOT = 1
+} AnimationType;
+
+
+// AnimationState
+typedef enum {
+    IDLE = 0,
+    RUNNING = 1,
+    JUMPING = 2,
+    WALLSLIDING = 3,
+    GLIDING = 4,
+    ATTACKING = 5,
+    DYING = 6,
+} AnimationState;
+
+
+// Timer
+typedef struct{
+    float lifetime;
+    float timeleft;
+} Timer;
+
+
+// Animation
+typedef struct{
+    AnimationType type;
+    int first;
+    int last;
+    int current;
+    int step;    
+    IntVector2 frameSize;
+    IntVector2 origin;
+    Timer timer; // timer for frames per seconds
+} Animation;
+
+
+// Entity
+typedef struct {
     IntVector2 position;
     Vector2 speed;
-    Vector2 acceleration;
 
-    // sûrement à modifier... ou enlever et mettre direct dans fonctions car constant ?
-    float VxMax;
-    float VyMax;
-    float VabsMax;
     //const float runSpeed;
     //const float runAcceleration;
     //const float runReduce;
@@ -53,30 +96,30 @@ typedef struct structEntity {
     //const float jumpSpeed;
     
     float angle;
-    int direction;
-    
+    Direction direction;
+
     Hitbox hitbox; // pour collisions avec entity
     IntRectangle physicsBox; // pour collisions avec map
-    
-    IntVector2 origin;
     Texture2D texture;
-    int animationState; // idle + walking + runing/dashing + jumping + dying + ... = choix en vertical sur la texture atlas
+    AnimationState animState;
+    Animation animation;
     
     Vector2 remain;
     bool grounded;
-    
-    // pour arc et flèche... à mettre autre part
-    bool grabbed; 
 } Entity;
 
-typedef struct structBlock {
+
+// Block
+typedef struct {
     Texture2D texture;
     bool solid;
     bool breakable;
     float coefRebond;
 } Block;
 
-typedef struct structItem {
+
+// Item
+typedef struct {
     IntVector2 position;
     Vector2 speed;
     Vector2 acceleration;
@@ -84,5 +127,6 @@ typedef struct structItem {
     Texture2D texture;
     Hitbox hitbox;
 } Item;
+
 
 #endif // STRUCTURES_H

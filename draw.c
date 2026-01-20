@@ -54,18 +54,21 @@ void drawHitbox(Hitbox hitbox, Color color){
 
 void drawEntity(Entity ent){
     // part du principe que la position (x,y) est le centre de la physicsBox (et pas le coin en haut à gauche)
-    Rectangle source = (Rectangle) {0, 0, ent.direction * ent.texture.width, ent.texture.height};
-    
+    //Rectangle source = (Rectangle) {0, 0, ent.direction * ent.texture.width, ent.texture.height};
+    Rectangle source = frameAnimation(&ent.animation);
+    source.width *= ent.direction;
+
     Rectangle dest;
     dest.x = ent.position.x * screenRatio;
     dest.y = ent.position.y * screenRatio;
-    dest.width = ent.texture.width * screenRatio;
-    dest.height = ent.texture.height * screenRatio;
+    dest.width = ent.animation.frameSize.x * screenRatio;
+    dest.height = ent.animation.frameSize.y * screenRatio;
 
     Vector2 origin;
-    if (ent.direction == 1) origin.x = ent.origin.x * screenRatio;
-    else if (ent.direction == -1) origin.x = (ent.texture.width - ent.origin.x) * screenRatio;
-    origin.y = ent.origin.y * screenRatio;
+    if (ent.direction == RIGHT) origin.x = ent.animation.origin.x * screenRatio;
+    else if (ent.direction == LEFT) origin.x = (ent.animation.frameSize.x - ent.animation.origin.x) * screenRatio;
+    else printf("erreur drawEntity\n");
+    origin.y = ent.animation.origin.y * screenRatio;
     
     DrawTexturePro(ent.texture, source, dest, origin, ent.angle, WHITE);
 }

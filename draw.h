@@ -6,6 +6,7 @@
 #include "raylib.h"
 #include "structures.h"
 #include "constants.h"
+#include "animation.h"
 
 void drawCross(int x, int y, Color color);
 void drawBlock(int x, int y, Block block);

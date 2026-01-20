@@ -142,10 +142,10 @@ void mouvement(Entity *player, int map[]){
     
     // regarde la bonne direction
     if (player->speed.x > 0){
-        player->direction = 1;
+        player->direction = RIGHT;
     }
     if (player->speed.x < 0){
-        player->direction = -1;
+        player->direction = LEFT;
     }
 
     // coyote jump
