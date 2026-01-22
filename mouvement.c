@@ -49,8 +49,8 @@ static void moveX(Entity *ent, int map[]){
             ent->physicsBox.x += moveSign;
 
             IntRectangle block;
-            for (int i = -1; i<2; i++){
-                for (int j = -1; j<2; j++){
+            for (int i = -1; i<=1; i++){
+                for (int j = -2; j<=2; j++){
                     int n = centerBlock + mapSizeY*i + j;
                     if (map[n] != 0){ // 0 = air
                         indexToIntRectangle(n, &block);
@@ -90,8 +90,8 @@ static void moveY(Entity *ent, int map[]){
             ent->physicsBox.y += moveSign;
 
             IntRectangle block;
-            for (int i = -1; i<2; i++){
-                for (int j = -1; j<2; j++){
+            for (int i = -1; i<=1; i++){
+                for (int j = -2; j<=2; j++){
                     int n = centerBlock + mapSizeY*i + j;
                     if (map[n] != 0){ // 0 = air
                         indexToIntRectangle(n, &block);
@@ -121,21 +121,32 @@ static void moveY(Entity *ent, int map[]){
 
 bool isWallSliding(Entity *player, int map[]){
     if (player->grounded) return false;
+
+    if (!(IsKeyDown(KEY_RIGHT) && player->direction == RIGHT) && !(IsKeyDown(KEY_LEFT) && player->direction == LEFT)){
+        return false;
+    }
+
+    // changer ?
     int touchWall = 2;
     if (touchWall < player->physicsBox.x - blockSize * (int) (player->physicsBox.x / blockSize) && 
         touchWall < blockSize * (int) ((player->physicsBox.x + player->physicsBox.width) / blockSize) - (player->physicsBox.x + player->physicsBox.width))
         return false;
 
-    int sideBlock = findBlockMap(*player, mapSizeX, mapSizeY) + mapSizeY*player->direction;
-    if (map[sideBlock + mapSizeY + 1] != 0 || map[sideBlock - 2*mapSizeY*player->direction + 1] != 0){
-        return false;
+    int middleBlock = findBlockMap(*player, mapSizeX, mapSizeY);
+    // blocks en dessous -> "grounded"
+    for (int h = 2; h<=3; h++){
+        if (map[middleBlock + h] != 0 || map[middleBlock - mapSizeY*player->direction + h] != 0){
+            return false;
+        }
     }
-    if (!(IsKeyDown(KEY_RIGHT) && player->direction == RIGHT) && !(IsKeyDown(KEY_LEFT) && player->direction == LEFT)){
-        return false;
-    } 
-    if (map[sideBlock-1] != 0 || map[sideBlock] != 0 || map[sideBlock+1] != 0){
-        return true;
+
+    // mur sur le coté ?
+    for (int h = -1; h<=1; h++){ // en hauteur
+        for (int s = 1; s<=2; s++){ // sideblock et sideblock d'après
+            if (map[middleBlock + s*mapSizeY*player->direction + h] != 0) return true;
+        }
     }
+
     return false;
 }
 

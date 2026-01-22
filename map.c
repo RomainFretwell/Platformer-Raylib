@@ -57,7 +57,7 @@ void testMap(int map[]){
     for (int x = 33; x < mapSizeX; x++){
         map[x*mapSizeY + 15] = 4;
     }
-    for (int y = 15; y < 64; y++){
+    for (int y = 15; y < 63; y++){
         map[24*mapSizeY + y] = 4;
         map[32*mapSizeY + y] = 4;
     }
