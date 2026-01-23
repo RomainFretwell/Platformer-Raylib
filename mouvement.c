@@ -285,7 +285,7 @@ void mouvement(Entity *player, int map[]){
     }
 
     // better jump hang (moins de gravité au sommet + boost de vitesse)
-    if (absf(player->speed.y) < jumpHangThresh && !player->grounded){
+    if (absf(player->speed.y) < jumpHangThresh && isJumping){
         //const char * test5 = TextFormat("jump hang");
         //DrawText(test5, 200*screenRatio, 200*screenRatio, 10*screenRatio, BLACK);
         gravity = hangGravity;
