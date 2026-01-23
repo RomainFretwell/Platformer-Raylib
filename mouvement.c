@@ -24,7 +24,7 @@ bool canDoubleJump = false;
 
 Timer coyoteTimer = {0.15f, 0.15f};
 
-Timer jumpBufferTimer = {0.1f, 0.1f};
+Timer jumpBufferTimer = {0.2f, 0.2f};
 
 Timer noControlWallJumpTimer = {0.1f, 0.1f};
 
@@ -163,6 +163,9 @@ void mouvement(Entity *player, int map[]){
         player->direction = LEFT;
     }
 
+    // slide against wall
+    wallSliding = isWallSliding(&(*player), map);
+    
     // coyote jump
     if(player->grounded || wallSliding){
         startTimer(&coyoteTimer);
@@ -176,7 +179,7 @@ void mouvement(Entity *player, int map[]){
         canDoubleJump = true;
     }
 
-    if (IsKeyDown(KEY_UP)){
+    if (IsKeyPressed(KEY_UP)){
         startTimer(&jumpBufferTimer);
     }
     else {
@@ -198,26 +201,18 @@ void mouvement(Entity *player, int map[]){
         canGlide = true;
     }
 
-    // slide against wall
-    wallSliding = isWallSliding(&(*player), map);
-    
-    const char * test1 = TextFormat("%s", wallSliding?"sliding":"");
-    DrawText(test1, 100*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
-
-    const char * test2 = TextFormat("%s", player->grounded?"grounded":"");
-    DrawText(test2, 100*screenRatio, 260*screenRatio, 10*screenRatio, BLACK);
-
-    const char * test3 = TextFormat("coyoteTimer = %f", coyoteTimer.timeleft);
-    DrawText(test3, 100*screenRatio, 270*screenRatio, 10*screenRatio, BLACK);
-
-    const char * test4 = TextFormat("jumpBufferTimer = %f", jumpBufferTimer.timeleft);
-    DrawText(test4, 100*screenRatio, 280*screenRatio, 10*screenRatio, BLACK);
-
-    const char * test5 = TextFormat("noControlWallJumpTimer = %f", noControlWallJumpTimer.timeleft);
-    DrawText(test5, 200*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
-
+    const char * test1 = TextFormat("%s", wallSliding?"SLIDING":"");
+    DrawText(test1, 400*screenRatio, 215*screenRatio, 10*screenRatio, BLACK);
+    const char * test2 = TextFormat("%s", player->grounded?"GROUNDED":"");
+    DrawText(test2, 400*screenRatio, 200*screenRatio, 10*screenRatio, BLACK);
+    //const char * test3 = TextFormat("coyoteTimer = %f", coyoteTimer.timeleft);
+    //DrawText(test3, 100*screenRatio, 270*screenRatio, 10*screenRatio, BLACK);
+    //const char * test4 = TextFormat("jumpBufferTimer = %f", jumpBufferTimer.timeleft);
+    //DrawText(test4, 100*screenRatio, 280*screenRatio, 10*screenRatio, BLACK);
+    //const char * test5 = TextFormat("noControlWallJumpTimer = %f", noControlWallJumpTimer.timeleft);
+    //DrawText(test5, 200*screenRatio, 250*screenRatio, 10*screenRatio, BLACK);
     const char * test6 = TextFormat("%s", isJumping?"JUMPING":"");
-    DrawText(test6, 400*screenRatio, 200*screenRatio, 10*screenRatio, BLACK);
+    DrawText(test6, 400*screenRatio, 230*screenRatio, 10*screenRatio, BLACK);
 
     // JUMP
     if (!timerIsDone(&coyoteTimer) && !timerIsDone(&jumpBufferTimer) && !wallSliding){
@@ -231,6 +226,7 @@ void mouvement(Entity *player, int map[]){
         player->grounded = false;
     }
     else if(IsKeyPressed(KEY_UP) && wallSliding){
+        isJumping = true;
         player->speed.y = wallJumpSpeed.y;
         player->speed.x = player->direction * wallJumpSpeed.x;
         //player->speed.x += player->solidSpeed.x; // si plateformes qui bouge ?
