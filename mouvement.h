@@ -10,6 +10,6 @@
 #include "collision.h"
 #include "time.h"
 
-void mouvement(Entity *player, int map[]);
+void mouvement(Entity *player, Map map);
 
 #endif // MOUVEMENT_H

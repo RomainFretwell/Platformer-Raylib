@@ -4,11 +4,12 @@
 #include <stdio.h>
 //#include <stdlib.h>
 //#include "raylib.h"
+#include "structures.h"
 #include "constants.h"
 
-void clearMap(int map[]);
-void initializeMap(int map[], FILE* fp);
-void testMap(int map[]); // à enlever plus tard
-void autoTile(bool** tab, int** tiled);
+void clearMap(Map map);
+void LoadMap(Map* map, FILE* fp);
+void testMap(Map* map); // à enlever plus tard
+void autoTile(Map map);
 
 #endif // MAP_H

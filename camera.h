@@ -8,7 +8,7 @@
 #include "constants.h"
 #include "math2.h"
 
-void limitCameraMap(Camera2D * camera);
+void limitCameraMap(Camera2D * camera, Map map);
 void cameraFollow(Camera2D * camera, Entity player);
 void cameraFollow2(Camera2D * camera, Entity player);
 void limitCameraFollow(Camera2D * camera, Entity player, int cameraFollowThresh);

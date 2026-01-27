@@ -10,8 +10,8 @@
 #include "draw.h" // à enlever après ?
 
 bool rectangleCollision(IntRectangle a, IntRectangle b);
-void indexToIntRectangle(int index, IntRectangle *rect);
-int findBlockMap(Entity ent);
+void indexToIntRectangle(int index, IntRectangle *rect, Map map); // mettre plutôt IntVector2 mapSize car on a pas besoin de tout
+int findBlockMap(Entity ent, Map map); // pareil
 void updatePhysicsBoxEntity(Entity *ent);
 
 bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2);

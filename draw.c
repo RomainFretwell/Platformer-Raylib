@@ -5,37 +5,57 @@ void drawCross(int x, int y, Color color){
     DrawLine(x*screenRatio, 0, x*screenRatio, 1200*screenRatio, color); // currentScreenSize.y
 }
 
-void drawBlock(int x, int y, Block block){
-    DrawTextureEx(block.texture, (Vector2){x*blockSize*sizeCoef*screenRatio, y*blockSize*sizeCoef*screenRatio}, 0, sizeCoef*screenRatio, WHITE);
+void drawBlock(TileSet tileSet, int x, int y, int material, int variant){
+    // vérifie si pas air = -1
+    if (material >= 0){
+        Rectangle source = (Rectangle){variant, material, blockSize, blockSize};
+
+        Rectangle dest;
+        dest.x = x * screenRatio;
+        dest.y = y * screenRatio;
+        dest.width = blockSize * screenRatio;
+        dest.height = blockSize * screenRatio;
+
+        DrawTexturePro(tileSet.texture, source, dest, (Vector2){0,0}, 0, WHITE);
+    }
 }
 
 void drawBlockHitbox(int x, int y, Color color){
-    float hitX = x * blockSize * sizeCoef * screenRatio;
-    float hitY = y * blockSize * sizeCoef * screenRatio;
-    float hitW = blockSize * sizeCoef * screenRatio;
-    float hitH = blockSize * sizeCoef * screenRatio;
+    float hitX = x * blockSize * screenRatio;
+    float hitY = y * blockSize * screenRatio;
+    float hitW = blockSize * screenRatio;
+    float hitH = blockSize * screenRatio;
 
     DrawRectangleLinesEx((Rectangle){hitX, hitY, hitW, hitH}, 1.0f, color);
 }
 
-void drawMap(int map[], Block blockID[]){
-    int i;
+void drawMap(Map map){
+    int index;
+    int material;
+    int variant;
+    
     if (showBlockHitbox){
-        for (int x = 0; x < mapSize.x; x++){
-            for (int y = 0; y < mapSize.y; y++){
-                i = x*mapSize.y + y;
-                if (blockID[map[i]].solid){ // if solid && showBlockHitbox (càd pas de l'air ou de l'eau)
-                    drawBlock(x, y, blockID[map[i]]);
+        for (int x = 0; x < map.size.x; x++){
+            for (int y = 0; y < map.size.y; y++){
+                index = x*map.size.y + y;
+                material = map.tiled[index] / map.tileSet.size.x;
+                variant = map.tiled[index] % map.tileSet.size.x;
+                if (material >= 0){ // if solid (càd pas de l'air ou de l'eau)
+                    drawBlock(map.tileSet, x, y, material, variant);
                     drawBlockHitbox(x, y, BLACK);
                 }
             }
         }
     }
     else {
-        for (int x = 0; x < mapSize.x; x++){
-            for (int y = 0; y < mapSize.y; y++){
-                i = x*mapSize.y + y;
-                drawBlock(x, y, blockID[map[i]]);
+        for (int x = 0; x < map.size.x; x++){
+            for (int y = 0; y < map.size.y; y++){
+                index = x*map.size.y + y;
+                material = map.tiled[index] / map.tileSet.size.x;
+                variant = map.tiled[index] % map.tileSet.size.x;
+                if (material >= 0){ // if solid (càd pas de l'air ou de l'eau)
+                    drawBlock(map.tileSet, x, y, material, variant);
+                }
             }
         }
     }
@@ -54,7 +74,6 @@ void drawHitbox(Hitbox hitbox, Color color){
 
 void drawEntity(Entity ent){
     // part du principe que la position (x,y) est le centre de la physicsBox (et pas le coin en haut à gauche)
-    //Rectangle source = (Rectangle) {0, 0, ent.direction * ent.texture.width, ent.texture.height};
     Rectangle source = frameAnimation(&ent.animation);
     source.width *= ent.direction;
 

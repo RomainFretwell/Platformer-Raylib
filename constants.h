@@ -1,11 +1,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "raylib.h"
 #include "structures.h"
 
-#define nbBlock 5
-#define blockSize 15 // les blocks sont de taille 15x15
-#define sizeCoef 1 // multiplier blockSize par sizeCoef pour des blocks plus gros
+#define blockSize 16
+#define MAX_MAP_SIZE_X 500
+#define MAX_MAP_SIZE_Y 500
 
 extern IntVector2 fullScreenSize;
 extern IntVector2 smallScreenSize;
@@ -14,7 +15,5 @@ extern float screenRatio;
 
 extern bool showBlockHitbox;
 extern bool showEntityHitbox;
-
-extern IntVector2 mapSize;
 
 #endif // CONSTANTS_H

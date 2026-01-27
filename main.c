@@ -47,46 +47,20 @@ int main(){
     currentScreenSize = smallScreenSize;
     screenRatio = 1.0f;
     
-    // Load block textures
-    Block air = {
-        .texture = LoadTexture("resources/air.png"), // transparent texture
-        .solid = false,
-        .breakable = false,
-        .coefRebond = 0.0f
-    };
-    Block dirt = {
-        .texture = LoadTexture("resources/dirt.png"),
-        .solid = true,
-        .breakable = true,
-        .coefRebond = 0.0f
-    };
-    Block grass = {
-        .texture = LoadTexture("resources/grass.png"),
-        .solid = true,
-        .breakable = true,
-        .coefRebond = 0.0f
-    };
-    Block stone = {
-        .texture = LoadTexture("resources/stone.png"),
-        .solid = true,
-        .breakable = true,
-        .coefRebond = 0.0f
-    };
-    Block gravel = {
-        .texture = LoadTexture("resources/gravel.png"),
-        .solid = true,
-        .breakable = true,
-        .coefRebond = 0.0f
-    };
-
-    Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
-
     // Map initialization
-    mapSize.x = 150;
-    mapSize.y = 70;
-    int map[mapSize.x * mapSize.y];
-    clearMap(map);
-    testMap(map);
+    Map mapDeTest;
+    mapDeTest.worldType = 0; // forêt ?
+    mapDeTest.size.x = 150;
+    mapDeTest.size.y = 70;
+    printf("--------------- ok ? ----------------\n");
+    mapDeTest.tileSet.texture = LoadTexture("resources/Block_Atlas.png");
+    printf("--------------- ok ! ----------------\n");
+    mapDeTest.tileSet.size = (IntVector2){20, 1};
+    printf("--------------- banane ----------------\n");
+    clearMap(mapDeTest); // passer arguments par adresses ???
+    printf("--------------- ananas ----------------\n");
+    testMap(&mapDeTest);
+    printf("--------------- OK ----------------\n");
     
     Color background_color = {220, 230, 255, 255};
 
@@ -216,8 +190,8 @@ int main(){
             showCross = !showCross;
         }
 
-        mouvement(&player, map);
-        updatePhysicsBoxEntity(&player);
+        //mouvement(&player, mapDeTest);
+        //updatePhysicsBoxEntity(&player);
 
         // ----------------------------------------------------------------------------------------
         //                                   Arrow
@@ -336,7 +310,7 @@ int main(){
             camera.zoom -= 0.1;
         }
         
-        limitCameraMap(&camera);
+        limitCameraMap(&camera, mapDeTest);
 
         BeginMode2D(camera);
 
@@ -347,7 +321,7 @@ int main(){
             limitCameraFollow(&camera, player, cameraFollowThresh);
         }
         
-        drawMap(map, blockID);
+        drawMap(mapDeTest);
         /* test affichage map dans le terminal
         if (IsKeyPressed(KEY_T)){
             printf("\nmap =\n");
@@ -440,11 +414,7 @@ int main(){
         deltaTime = GetFrameTime();
     }
     
-    UnloadTexture(air.texture);
-    UnloadTexture(dirt.texture);
-    UnloadTexture(grass.texture);
-    UnloadTexture(stone.texture);
-    UnloadTexture(gravel.texture);
+    UnloadTexture(mapDeTest.tileSet.texture);
     UnloadTexture(player.texture);
     UnloadTexture(bow.texture);
     UnloadTexture(arrow.texture);

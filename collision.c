@@ -9,17 +9,17 @@ bool rectangleCollision(IntRectangle a, IntRectangle b){
     );
 }
 
-void indexToIntRectangle(int index, IntRectangle *rect){
-    rect->x = blockSize * (index / mapSize.y);
-    rect->y = blockSize * (index % mapSize.y);
+void indexToIntRectangle(int index, IntRectangle *rect, Map map){
+    rect->x = blockSize * (index / map.size.y);
+    rect->y = blockSize * (index % map.size.y);
     rect->width = blockSize;
     rect->height = blockSize;
 }
 
-int findBlockMap(Entity ent){
+int findBlockMap(Entity ent, Map map){
     int x = ent.position.x / blockSize;
     int y = ent.position.y / blockSize;
-    return x%mapSize.x * mapSize.y + y%mapSize.y; // % mapSize.x  ?
+    return x%map.size.x * map.size.y + y%map.size.y; // % map.size.x  ?
 }
 
 void updatePhysicsBoxEntity(Entity *ent){

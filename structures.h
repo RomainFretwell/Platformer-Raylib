@@ -108,14 +108,60 @@ typedef struct {
     bool grounded;
 } Entity;
 
+// BlockVariant
+typedef enum {
+    
+	FULL = 0,
+
+	// R=Right  L=Left  U=Up  D=Down  C=Corner
+	R_WALL = 5,
+	L_WALL = 4,
+	U_WALL = 1,
+	D_WALL = 2,
+	
+	RU_WALL = 9,
+	LU_WALL = 8,
+	RD_WALL = 11,
+	LD_WALL = 10,
+	
+	RLU_WALL = 16,
+	RL_WALL = 17,
+	RLD_WALL = 18,
+	
+	UDR_WALL = 7,
+	UD_WALL = 3,
+	UDL_WALL = 6,
+	
+	RLUD_WALL = 19,
+	
+	CRU_WALL = 13,
+	CLU_WALL = 12,
+	CRD_WALL = 15,
+	CLD_WALL = 14,
+	
+} Variant;
+
+typedef struct{
+    Texture2D texture;
+    IntVector2 size;
+} TileSet;
+
+typedef struct{
+	int worldType; // forêt, glace, volcan, chateau en ruines, ...
+    TileSet tileSet;
+
+	IntVector2 size;
+    int* data; // data[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
+    int* tiled; // tiled[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
+} Map;
 
 // Block
-typedef struct {
-    Texture2D texture;
-    bool solid;
-    bool breakable;
-    float coefRebond;
-} Block;
+//typedef struct {
+//    Texture2D texture;
+//    bool solid;
+//    bool breakable;
+//    float coefRebond;
+//} Block;
 
 
 // Item

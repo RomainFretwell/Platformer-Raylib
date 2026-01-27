@@ -34,7 +34,7 @@ const float hangBoostThresh = runSpeed * 0.1;
 const float hangBoost = runSpeed * 1.2;
 
 
-static void moveX(Entity *ent, int map[]){
+static void moveX(Entity *ent, Map map){
     ent->remain.x += ent->speed.x;
     int moveX = arrondir(ent->remain.x);
     
@@ -43,7 +43,7 @@ static void moveX(Entity *ent, int map[]){
         int moveSign = signInt(moveX); // droite ou gauche
         bool collisionHappened = false;
 
-        int centerBlock = findBlockMap(*ent);
+        int centerBlock = findBlockMap(*ent, map);
 
         // bouge ent jusqu'à une collision
         while(!collisionHappened && moveX != 0){
@@ -52,9 +52,9 @@ static void moveX(Entity *ent, int map[]){
             IntRectangle block;
             for (int i = -1; i<=1; i++){
                 for (int j = -2; j<=2; j++){
-                    int n = centerBlock + mapSize.y*i + j;
-                    if (map[n] != 0){ // 0 = air
-                        indexToIntRectangle(n, &block);
+                    int n = centerBlock + map.size.y*i + j;
+                    if (map.data[n] != 0){ // 0 = air
+                        indexToIntRectangle(n, &block, map);
                         if (rectangleCollision(ent->physicsBox, block)){
                             ent->speed.x = 0;
                             ent->remain.x = 0.0f;
@@ -76,7 +76,7 @@ static void moveX(Entity *ent, int map[]){
 }
 
 
-static void moveY(Entity *ent, int map[]){
+static void moveY(Entity *ent, Map map){
     ent->remain.y += ent->speed.y;
     int moveY = arrondir(ent->remain.y);
     if(moveY != 0){
@@ -84,7 +84,7 @@ static void moveY(Entity *ent, int map[]){
         int moveSign = signInt(moveY); // droite ou gauche
         bool collisionHappened = false;
 
-        int centerBlock = findBlockMap(*ent);
+        int centerBlock = findBlockMap(*ent, map);
 
         // bouge ent jusqu'à une collision
         while(!collisionHappened && moveY != 0){
@@ -93,9 +93,9 @@ static void moveY(Entity *ent, int map[]){
             IntRectangle block;
             for (int i = -1; i<=1; i++){
                 for (int j = -2; j<=2; j++){
-                    int n = centerBlock + mapSize.y*i + j;
-                    if (map[n] != 0){ // 0 = air
-                        indexToIntRectangle(n, &block);
+                    int n = centerBlock + map.size.y*i + j;
+                    if (map.data[n] != 0){ // 0 = air
+                        indexToIntRectangle(n, &block, map);
                         if (rectangleCollision(ent->physicsBox, block)){
                             if(ent->speed.y > 0.0f){ // falling
                                 ent->grounded = true;
@@ -120,7 +120,7 @@ static void moveY(Entity *ent, int map[]){
     }
 }
 
-bool isWallSliding(Entity *player, int map[]){
+bool isWallSliding(Entity *player, Map map){
     if (player->grounded) return false;
 
     if (!(IsKeyDown(KEY_RIGHT) && player->direction == RIGHT) && !(IsKeyDown(KEY_LEFT) && player->direction == LEFT)){
@@ -133,10 +133,10 @@ bool isWallSliding(Entity *player, int map[]){
         touchWall < blockSize * (int) ((player->physicsBox.x + player->physicsBox.width) / blockSize) - (player->physicsBox.x + player->physicsBox.width))
         return false;
 
-    int middleBlock = findBlockMap(*player);
+    int middleBlock = findBlockMap(*player, map);
     // blocks en dessous -> "grounded"
     for (int h = 2; h<=3; h++){
-        if (map[middleBlock + h] != 0 || map[middleBlock - mapSize.y*player->direction + h] != 0){
+        if (map.data[middleBlock + h] != 0 || map.data[middleBlock - map.size.y*player->direction + h] != 0){
             return false;
         }
     }
@@ -144,14 +144,14 @@ bool isWallSliding(Entity *player, int map[]){
     // mur sur le coté ?
     for (int h = -1; h<=1; h++){ // en hauteur
         for (int s = 1; s<=2; s++){ // sideblock et sideblock d'après
-            if (map[middleBlock + s*mapSize.y*player->direction + h] != 0) return true;
+            if (map.data[middleBlock + s*map.size.y*player->direction + h] != 0) return true;
         }
     }
 
     return false;
 }
 
-void mouvement(Entity *player, int map[]){
+void mouvement(Entity *player, Map map){
     
     float dt = GetFrameTime();
     
