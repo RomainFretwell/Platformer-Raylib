@@ -11,7 +11,7 @@
 
 bool rectangleCollision(IntRectangle a, IntRectangle b);
 void indexToIntRectangle(int index, IntRectangle *rect);
-int findBlockMap(Entity ent, int mapSizeX, int mapSizeY); // à enlever ?
+int findBlockMap(Entity ent);
 void updatePhysicsBoxEntity(Entity *ent);
 
 bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2);

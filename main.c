@@ -82,9 +82,9 @@ int main(){
     Block blockID[nbBlock] = {air, dirt, grass, stone, gravel};
 
     // Map initialization
-    mapSizeX = 150;
-    mapSizeY = 70;
-    int map[mapSizeX * mapSizeY];
+    mapSize.x = 150;
+    mapSize.y = 70;
+    int map[mapSize.x * mapSize.y];
     clearMap(map);
     testMap(map);
     
@@ -351,9 +351,9 @@ int main(){
         /* test affichage map dans le terminal
         if (IsKeyPressed(KEY_T)){
             printf("\nmap =\n");
-            for (int j = 0; j<mapSizeY; j++){
-                for (int i = 0; i<mapSizeX; i++){
-                    printf("%d", map[i*mapSizeY+j]);
+            for (int j = 0; j<mapSize.y; j++){
+                for (int i = 0; i<mapSize.x; i++){
+                    printf("%d", map[i*mapSize.y+j]);
                 }
                 printf("\n");
             }

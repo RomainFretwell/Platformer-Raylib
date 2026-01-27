@@ -15,7 +15,6 @@ extern float screenRatio;
 extern bool showBlockHitbox;
 extern bool showEntityHitbox;
 
-extern int mapSizeX;
-extern int mapSizeY;
+extern IntVector2 mapSize;
 
 #endif // CONSTANTS_H

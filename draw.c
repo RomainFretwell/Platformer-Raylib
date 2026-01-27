@@ -21,9 +21,9 @@ void drawBlockHitbox(int x, int y, Color color){
 void drawMap(int map[], Block blockID[]){
     int i;
     if (showBlockHitbox){
-        for (int x = 0; x < mapSizeX; x++){
-            for (int y = 0; y < mapSizeY; y++){
-                i = x*mapSizeY + y;
+        for (int x = 0; x < mapSize.x; x++){
+            for (int y = 0; y < mapSize.y; y++){
+                i = x*mapSize.y + y;
                 if (blockID[map[i]].solid){ // if solid && showBlockHitbox (càd pas de l'air ou de l'eau)
                     drawBlock(x, y, blockID[map[i]]);
                     drawBlockHitbox(x, y, BLACK);
@@ -32,9 +32,9 @@ void drawMap(int map[], Block blockID[]){
         }
     }
     else {
-        for (int x = 0; x < mapSizeX; x++){
-            for (int y = 0; y < mapSizeY; y++){
-                i = x*mapSizeY + y;
+        for (int x = 0; x < mapSize.x; x++){
+            for (int y = 0; y < mapSize.y; y++){
+                i = x*mapSize.y + y;
                 drawBlock(x, y, blockID[map[i]]);
             }
         }

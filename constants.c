@@ -8,5 +8,4 @@ float screenRatio = 1.0f;
 bool showBlockHitbox = false;
 bool showEntityHitbox = false;
 
-int mapSizeX = 36;
-int mapSizeY = 36;
+IntVector2 mapSize;

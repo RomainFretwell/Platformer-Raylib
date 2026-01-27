@@ -4,14 +4,14 @@ void limitCameraMap(Camera2D * camera){
     if (camera->target.x < camera->offset.x){
         camera->target.x = camera->offset.x;
     }
-    if (camera->target.x > camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.x){
-        camera->target.x = camera->offset.x + mapSizeX*blockSize*screenRatio - currentScreenSize.x;
+    if (camera->target.x > camera->offset.x + mapSize.x*blockSize*screenRatio - currentScreenSize.x){
+        camera->target.x = camera->offset.x + mapSize.x*blockSize*screenRatio - currentScreenSize.x;
     }
     if (camera->target.y < camera->offset.y){
         camera->target.y = camera->offset.y;
     }
-    if (camera->target.y > camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.y){
-        camera->target.y = camera->offset.y + mapSizeY*blockSize*screenRatio - currentScreenSize.y;
+    if (camera->target.y > camera->offset.y + mapSize.y*blockSize*screenRatio - currentScreenSize.y){
+        camera->target.y = camera->offset.y + mapSize.y*blockSize*screenRatio - currentScreenSize.y;
     }
 }
 

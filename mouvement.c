@@ -43,7 +43,7 @@ static void moveX(Entity *ent, int map[]){
         int moveSign = signInt(moveX); // droite ou gauche
         bool collisionHappened = false;
 
-        int centerBlock = findBlockMap(*ent, mapSizeX, mapSizeY);
+        int centerBlock = findBlockMap(*ent);
 
         // bouge ent jusqu'à une collision
         while(!collisionHappened && moveX != 0){
@@ -52,7 +52,7 @@ static void moveX(Entity *ent, int map[]){
             IntRectangle block;
             for (int i = -1; i<=1; i++){
                 for (int j = -2; j<=2; j++){
-                    int n = centerBlock + mapSizeY*i + j;
+                    int n = centerBlock + mapSize.y*i + j;
                     if (map[n] != 0){ // 0 = air
                         indexToIntRectangle(n, &block);
                         if (rectangleCollision(ent->physicsBox, block)){
@@ -84,7 +84,7 @@ static void moveY(Entity *ent, int map[]){
         int moveSign = signInt(moveY); // droite ou gauche
         bool collisionHappened = false;
 
-        int centerBlock = findBlockMap(*ent, mapSizeX, mapSizeY);
+        int centerBlock = findBlockMap(*ent);
 
         // bouge ent jusqu'à une collision
         while(!collisionHappened && moveY != 0){
@@ -93,7 +93,7 @@ static void moveY(Entity *ent, int map[]){
             IntRectangle block;
             for (int i = -1; i<=1; i++){
                 for (int j = -2; j<=2; j++){
-                    int n = centerBlock + mapSizeY*i + j;
+                    int n = centerBlock + mapSize.y*i + j;
                     if (map[n] != 0){ // 0 = air
                         indexToIntRectangle(n, &block);
                         if (rectangleCollision(ent->physicsBox, block)){
@@ -133,10 +133,10 @@ bool isWallSliding(Entity *player, int map[]){
         touchWall < blockSize * (int) ((player->physicsBox.x + player->physicsBox.width) / blockSize) - (player->physicsBox.x + player->physicsBox.width))
         return false;
 
-    int middleBlock = findBlockMap(*player, mapSizeX, mapSizeY);
+    int middleBlock = findBlockMap(*player);
     // blocks en dessous -> "grounded"
     for (int h = 2; h<=3; h++){
-        if (map[middleBlock + h] != 0 || map[middleBlock - mapSizeY*player->direction + h] != 0){
+        if (map[middleBlock + h] != 0 || map[middleBlock - mapSize.y*player->direction + h] != 0){
             return false;
         }
     }
@@ -144,7 +144,7 @@ bool isWallSliding(Entity *player, int map[]){
     // mur sur le coté ?
     for (int h = -1; h<=1; h++){ // en hauteur
         for (int s = 1; s<=2; s++){ // sideblock et sideblock d'après
-            if (map[middleBlock + s*mapSizeY*player->direction + h] != 0) return true;
+            if (map[middleBlock + s*mapSize.y*player->direction + h] != 0) return true;
         }
     }
 
