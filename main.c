@@ -187,21 +187,6 @@ int main(){
         if (IsKeyPressed(KEY_C)){
             showCross = !showCross;
         }
-        if (IsKeyPressed(KEY_A)){
-            autoTile(mapDeTest);
-        }
-
-        IntVector2 mouseWorldPos;
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-            mouseWorldPos = (IntVector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio};
-            //mouseWorldPos = GetScreenToWorld2D(mouseWorldPos, camera);
-            mapDeTest.data[((int) mouseWorldPos.x / mapDeTest.size.x)%(blockSize*mapDeTest.size.x) * mapDeTest.size.y + ((int) mouseWorldPos.y / mapDeTest.size.y)%(blockSize*mapDeTest.size.y)] = 1;
-        }
-        else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
-            mouseWorldPos = (IntVector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio};
-            //mouseWorldPos = GetScreenToWorld2D(mouseWorldPos, camera);
-            mapDeTest.data[((int) mouseWorldPos.x / mapDeTest.size.x)%(blockSize*mapDeTest.size.x) * mapDeTest.size.y + ((int) mouseWorldPos.y / mapDeTest.size.y)%(blockSize*mapDeTest.size.y)] = 0;
-        }
 
         mouvement(&player, mapDeTest);
         updatePhysicsBoxEntity(&player);
@@ -330,9 +315,24 @@ int main(){
         if (!IsKeyDown(KEY_X)){
             cameraFollow(&camera, player);
             //cameraFollow2(&camera, player);
-            int cameraFollowThresh = 120;
-            limitCameraFollow(&camera, player, cameraFollowThresh);
+            //int cameraFollowThresh = 120;
+            //limitCameraFollow(&camera, player, cameraFollowThresh);
         }
+
+        Vector2 mouseWorldPos;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+            mouseWorldPos = GetMousePosition(); //(IntVector2){GetMouseX(), GetMouseY()};
+            mouseWorldPos.x = (mouseWorldPos.x + camera.target.x - camera.offset.x) / (blockSize*screenRatio);
+            mouseWorldPos.y = (mouseWorldPos.y + camera.target.y - camera.offset.y) / (blockSize*screenRatio);
+            mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = 1;
+        }
+        else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+            mouseWorldPos = GetMousePosition(); //(IntVector2){GetMouseX(), GetMouseY()};
+            mouseWorldPos.x = (mouseWorldPos.x + camera.target.x - camera.offset.x) / (blockSize*screenRatio);
+            mouseWorldPos.y = (mouseWorldPos.y + camera.target.y - camera.offset.y) / (blockSize*screenRatio);
+            mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = 0;
+        }
+        autoTile(mapDeTest);
         
         drawMap(mapDeTest);
         //* test affichage map dans le terminal
@@ -403,9 +403,11 @@ int main(){
         
         // test mouse
         const char * test5 = TextFormat("mouse SCREEN\nX = %f\nY = %f", GetMousePosition().x/screenRatio, GetMousePosition().y/screenRatio);
-        DrawText(test5, 10, 150, 20, BLACK);
-        const char * test6 = TextFormat("mouse WORLD\nX = %f\nY = %f", GetScreenToWorld2D((Vector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio}, camera).x/screenRatio,  GetScreenToWorld2D((Vector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio}, camera).y/screenRatio);
-        DrawText(test6, 10, 250, 20, BLACK);
+        DrawText(test5, 400, 50, 20, BLACK);
+        const char * test6 = TextFormat("camera target\nX = %f\nY = %f", camera.target.x, camera.target.y);
+        DrawText(test6, 400, 150, 20, BLACK);
+        //const char * test7 = TextFormat("camera offset\nX = %f\nY = %f", camera.offset.x, camera.offset.y);
+        //DrawText(test7, 400, 250, 20, BLACK);
 
         /* test arrow
         // test arrow
