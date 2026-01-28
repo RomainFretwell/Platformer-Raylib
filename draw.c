@@ -8,11 +8,11 @@ void drawCross(int x, int y, Color color){
 void drawBlock(TileSet tileSet, int x, int y, int material, int variant){
     // vérifie si pas air = -1
     if (material >= 0){
-        Rectangle source = (Rectangle){variant, material, blockSize, blockSize};
+        Rectangle source = (Rectangle){variant*blockSize, material*blockSize, blockSize, blockSize};
 
         Rectangle dest;
-        dest.x = x * screenRatio;
-        dest.y = y * screenRatio;
+        dest.x = x * blockSize * screenRatio;
+        dest.y = y * blockSize * screenRatio;
         dest.width = blockSize * screenRatio;
         dest.height = blockSize * screenRatio;
 
@@ -33,14 +33,14 @@ void drawMap(Map map){
     int index;
     int material;
     int variant;
-    
+
     if (showBlockHitbox){
         for (int x = 0; x < map.size.x; x++){
             for (int y = 0; y < map.size.y; y++){
                 index = x*map.size.y + y;
                 material = map.tiled[index] / map.tileSet.size.x;
                 variant = map.tiled[index] % map.tileSet.size.x;
-                if (material >= 0){ // if solid (càd pas de l'air ou de l'eau)
+                if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
                     drawBlock(map.tileSet, x, y, material, variant);
                     drawBlockHitbox(x, y, BLACK);
                 }
@@ -53,7 +53,7 @@ void drawMap(Map map){
                 index = x*map.size.y + y;
                 material = map.tiled[index] / map.tileSet.size.x;
                 variant = map.tiled[index] % map.tileSet.size.x;
-                if (material >= 0){ // if solid (càd pas de l'air ou de l'eau)
+                if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
                     drawBlock(map.tileSet, x, y, material, variant);
                 }
             }

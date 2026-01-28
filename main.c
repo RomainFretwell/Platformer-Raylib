@@ -48,19 +48,18 @@ int main(){
     screenRatio = 1.0f;
     
     // Map initialization
-    Map mapDeTest;
-    mapDeTest.worldType = 0; // forêt ?
-    mapDeTest.size.x = 150;
-    mapDeTest.size.y = 70;
-    printf("--------------- ok ? ----------------\n");
-    mapDeTest.tileSet.texture = LoadTexture("resources/Block_Atlas.png");
-    printf("--------------- ok ! ----------------\n");
-    mapDeTest.tileSet.size = (IntVector2){20, 1};
-    printf("--------------- banane ----------------\n");
-    clearMap(mapDeTest); // passer arguments par adresses ???
-    printf("--------------- ananas ----------------\n");
-    testMap(&mapDeTest);
-    printf("--------------- OK ----------------\n");
+    Map mapDeTest = (Map){
+        .worldType = 0, // forêt ?
+        .size.x = 150,
+        .size.y = 70,
+        .tileSet.texture = LoadTexture("resources/Block_Atlas.png"),
+        .tileSet.size = (IntVector2){20, 1},
+        .data = malloc(sizeof(int) * mapDeTest.size.x * mapDeTest.size.y),
+        .tiled = malloc(sizeof(int) * mapDeTest.size.x * mapDeTest.size.y),
+    };
+    clearMap(mapDeTest);
+    testMap(mapDeTest);
+    autoTile(mapDeTest);
     
     Color background_color = {220, 230, 255, 255};
 
@@ -178,20 +177,34 @@ int main(){
             camera.offset = (Vector2){currentScreenSize.x/2, currentScreenSize.y/2};
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
-
+        if (IsKeyPressed(KEY_F3)){
+            showDebugInfo = !showDebugInfo;
+        }
         if (IsKeyPressed(KEY_H)){
             showBlockHitbox = !showBlockHitbox;
             showEntityHitbox = !showEntityHitbox;
         }
-        if (IsKeyPressed(KEY_T)){
-            showDebugInfo = !showDebugInfo;
-        }
         if (IsKeyPressed(KEY_C)){
             showCross = !showCross;
         }
+        if (IsKeyPressed(KEY_A)){
+            autoTile(mapDeTest);
+        }
 
-        //mouvement(&player, mapDeTest);
-        //updatePhysicsBoxEntity(&player);
+        IntVector2 mouseWorldPos;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+            mouseWorldPos = (IntVector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio};
+            //mouseWorldPos = GetScreenToWorld2D(mouseWorldPos, camera);
+            mapDeTest.data[((int) mouseWorldPos.x / mapDeTest.size.x)%(blockSize*mapDeTest.size.x) * mapDeTest.size.y + ((int) mouseWorldPos.y / mapDeTest.size.y)%(blockSize*mapDeTest.size.y)] = 1;
+        }
+        else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+            mouseWorldPos = (IntVector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio};
+            //mouseWorldPos = GetScreenToWorld2D(mouseWorldPos, camera);
+            mapDeTest.data[((int) mouseWorldPos.x / mapDeTest.size.x)%(blockSize*mapDeTest.size.x) * mapDeTest.size.y + ((int) mouseWorldPos.y / mapDeTest.size.y)%(blockSize*mapDeTest.size.y)] = 0;
+        }
+
+        mouvement(&player, mapDeTest);
+        updatePhysicsBoxEntity(&player);
 
         // ----------------------------------------------------------------------------------------
         //                                   Arrow
@@ -322,22 +335,20 @@ int main(){
         }
         
         drawMap(mapDeTest);
-        /* test affichage map dans le terminal
+        //* test affichage map dans le terminal
         if (IsKeyPressed(KEY_T)){
             printf("\nmap =\n");
-            for (int j = 0; j<mapSize.y; j++){
-                for (int i = 0; i<mapSize.x; i++){
-                    printf("%d", map[i*mapSize.y+j]);
+            for (int j = 0; j<mapDeTest.size.y; j++){
+                for (int i = 0; i<20; i++){
+                    printf("%d", mapDeTest.tiled[i*mapDeTest.size.y+j]);
                 }
                 printf("\n");
             }
             printf("\n");
         }
-        */
-        
+        //*/
 
         // affichage des entity (dans le bon ordre)
-
         drawEntity(player);
         //drawEntity(bow);
         //drawEntity(arrow);
@@ -390,7 +401,11 @@ int main(){
             DrawText(test4, 10, 150, 20, BLACK);
         }
         
-        
+        // test mouse
+        const char * test5 = TextFormat("mouse SCREEN\nX = %f\nY = %f", GetMousePosition().x/screenRatio, GetMousePosition().y/screenRatio);
+        DrawText(test5, 10, 150, 20, BLACK);
+        const char * test6 = TextFormat("mouse WORLD\nX = %f\nY = %f", GetScreenToWorld2D((Vector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio}, camera).x/screenRatio,  GetScreenToWorld2D((Vector2){GetMouseX()/screenRatio, GetMouseY()/screenRatio}, camera).y/screenRatio);
+        DrawText(test6, 10, 250, 20, BLACK);
 
         /* test arrow
         // test arrow
@@ -414,6 +429,9 @@ int main(){
         deltaTime = GetFrameTime();
     }
     
+    free(mapDeTest.data);
+    free(mapDeTest.tiled);
+
     UnloadTexture(mapDeTest.tileSet.texture);
     UnloadTexture(player.texture);
     UnloadTexture(bow.texture);

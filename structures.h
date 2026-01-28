@@ -111,7 +111,7 @@ typedef struct {
 // BlockVariant
 typedef enum {
     
-	FULL = 0,
+	FULL_WALL = 0,
 
 	// R=Right  L=Left  U=Up  D=Down  C=Corner
 	R_WALL = 5,
