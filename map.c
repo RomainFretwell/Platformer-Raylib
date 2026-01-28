@@ -57,6 +57,10 @@ void testMap(Map map){
         map.data[32*map.size.y + j] = 1;
     }
 
+    for (int i = 80; i < map.size.x; i+=7){
+        map.data[i*map.size.y + 30] = 1;
+    }
+    
     for (int i = 0; i < 4; i++){
         for (int j = 0; j < 6; j++){
             map.data[(50+i+8*j)*map.size.y + map.size.y-12 - 4*j] = 1;
