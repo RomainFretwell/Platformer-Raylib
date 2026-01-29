@@ -9,6 +9,6 @@ Objectif : faire un platformer dans un style 8 bit médiéval avec une option cr
 - on multiplie position par screenRatio donc on bouge de 3 pixels à chaque fois en grand écran (même si pas le vrai problème car on peut aussi voir sacadé en petit écran)
 
 ## TODO
-- optimisation fonctions : completeAutoTile et autoTile (que pour les 9 blocks concerné)
+- Dessiner tileset grass
 - Faire tableau d'animation avec comme index : AnimationState animState
 - Retrouver de bonnes valeurs pour avoir un mouvement sympa 
