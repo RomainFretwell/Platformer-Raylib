@@ -108,6 +108,15 @@ typedef struct {
     bool grounded;
 } Entity;
 
+
+// Material
+typedef enum {
+    AIR = 0,
+    DARK_BRICKS = 1,
+    DIRT = 2,
+} Matter;
+
+
 // BlockVariant
 typedef enum {
     
@@ -141,10 +150,12 @@ typedef enum {
 	
 } Variant;
 
+
 typedef struct{
     Texture2D texture;
     IntVector2 size;
 } TileSet;
+
 
 typedef struct{
 	int worldType; // forêt, glace, volcan, chateau en ruines, ...
@@ -154,6 +165,7 @@ typedef struct{
     int* data; // data[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
     int* tiled; // tiled[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
 } Map;
+
 
 // Block
 //typedef struct {

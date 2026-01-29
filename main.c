@@ -61,6 +61,8 @@ int main(){
     testMap(mapDeTest);
     completeAutoTile(mapDeTest);
     
+    int selectedMaterial = DARK_BRICKS;
+    
     Color background_color = {220, 230, 255, 255};
 
     float gravity = 13.0f; //0.3f
@@ -324,7 +326,7 @@ int main(){
             mouseWorldPos = GetMousePosition(); //(IntVector2){GetMouseX(), GetMouseY()};
             mouseWorldPos.x = (mouseWorldPos.x + camera.target.x - camera.offset.x) / (blockSize*screenRatio);
             mouseWorldPos.y = (mouseWorldPos.y + camera.target.y - camera.offset.y) / (blockSize*screenRatio);
-            mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = 1;
+            mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = selectedMaterial;
             localAutoTile(mapDeTest, (int) mouseWorldPos.x, (int) mouseWorldPos.y);
         }
         else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
