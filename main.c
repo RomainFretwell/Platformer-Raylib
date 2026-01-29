@@ -59,7 +59,7 @@ int main(){
     };
     clearMap(mapDeTest);
     testMap(mapDeTest);
-    autoTile(mapDeTest);
+    completeAutoTile(mapDeTest);
     
     Color background_color = {220, 230, 255, 255};
 
@@ -325,14 +325,15 @@ int main(){
             mouseWorldPos.x = (mouseWorldPos.x + camera.target.x - camera.offset.x) / (blockSize*screenRatio);
             mouseWorldPos.y = (mouseWorldPos.y + camera.target.y - camera.offset.y) / (blockSize*screenRatio);
             mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = 1;
+            localAutoTile(mapDeTest, (int) mouseWorldPos.x, (int) mouseWorldPos.y);
         }
         else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
             mouseWorldPos = GetMousePosition(); //(IntVector2){GetMouseX(), GetMouseY()};
             mouseWorldPos.x = (mouseWorldPos.x + camera.target.x - camera.offset.x) / (blockSize*screenRatio);
             mouseWorldPos.y = (mouseWorldPos.y + camera.target.y - camera.offset.y) / (blockSize*screenRatio);
             mapDeTest.data[ (int) mouseWorldPos.x  * mapDeTest.size.y + (int) mouseWorldPos.y ] = 0;
+            localAutoTile(mapDeTest, (int) mouseWorldPos.x, (int) mouseWorldPos.y);
         }
-        autoTile(mapDeTest);
         
         drawMap(mapDeTest);
         //* test affichage map dans le terminal

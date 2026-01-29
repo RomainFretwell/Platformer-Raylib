@@ -70,153 +70,153 @@ void testMap(Map map){
     
 }
 
+void autoTile(Map map, int x, int y){
+    // hors de la map
+    if (x <= 0 || x >= map.size.x-1 || y <= 0 || y >= map.size.y-1){
+        // bords de la map
+        if (x == 0 || x == map.size.x-1 || y == 0 || y == map.size.y-1){
+            map.tiled[x*map.size.y + y] = FULL_WALL;
+        }
+    }
+    // air
+    else if (!map.data[x*map.size.y + y]){
+		map.tiled[x*map.size.y + y] = -1; // -1 pour l'air
+	}
+    // blocks partout autour
+	else if (	map.data[(x-1)*map.size.y + y-1] && map.data[x*map.size.y + y-1] && map.data[(x+1)*map.size.y + y-1] &&
+				map.data[(x-1)*map.size.y + y]   && 							    map.data[(x+1)*map.size.y + y]   &&
+				map.data[(x-1)*map.size.y + y+1] && map.data[x*map.size.y + y+1] && map.data[(x+1)*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = FULL_WALL ;
+	}
+    // U_WALL
+	else if (                                       !map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y]  && 							        map.data[(x+1)*map.size.y + y]   &&
+				                                    map.data[x*map.size.y + y+1]  ){
+		map.tiled[x*map.size.y + y] = U_WALL;
+	}
+	// D_WALL
+	else if (	                                map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = D_WALL;
+    }
+	// UD_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = UD_WALL;
+    }
+    // L_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = L_WALL;
+    }
+    // R_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = R_WALL;
+    }
+    // UDL_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = UDL_WALL;
+    }
+    // UDR_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = UDR_WALL;
+    }
+    // LU_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = LU_WALL;
+    }
+    // RU_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RU_WALL;
+    }
+    // LD_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = LD_WALL;
+    }
+    // RD_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RD_WALL;
+    }
+    // CLU_WALL
+    else if (	!map.data[(x-1)*map.size.y + y-1] && map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y]   && 							    map.data[(x+1)*map.size.y + y] &&
+				                                    map.data[x*map.size.y + y+1]  ){
+		map.tiled[x*map.size.y + y] = CLU_WALL ;
+	}
+    // CRU_WALL
+    else if (	                                    map.data[x*map.size.y + y-1] && !map.data[(x+1)*map.size.y + y-1] &&
+				map.data[(x-1)*map.size.y + y]   && 							    map.data[(x+1)*map.size.y + y]   &&
+				                                    map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = CRU_WALL ;
+	}
+    // CLD_WALL
+    else if (	                                    map.data[x*map.size.y + y-1] &&
+				map.data[(x-1)*map.size.y + y]   && 							    map.data[(x+1)*map.size.y + y]   &&
+				!map.data[(x-1)*map.size.y + y+1] && map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = CLD_WALL ;
+	}
+    // CRD_WALL
+    else if (	                                    map.data[x*map.size.y + y-1] && 
+				map.data[(x-1)*map.size.y + y]   && 							    map.data[(x+1)*map.size.y + y]   &&
+				                                    map.data[x*map.size.y + y+1] && !map.data[(x+1)*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = CRD_WALL ;
+	}
+    // RLU_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RLU_WALL;
+    }
+    // RL_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RL_WALL;
+    }
+    // RLD_WALL
+    else if (	                                map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RLD_WALL;
+    }
+    // RLUD_WALL
+    else if (	                                !map.data[x*map.size.y + y-1] && 
+				!map.data[(x-1)*map.size.y + y] && 							    !map.data[(x+1)*map.size.y + y] &&
+				                                !map.data[x*map.size.y + y+1] ){
+		map.tiled[x*map.size.y + y] = RLUD_WALL;
+    }
+    else printf("erreur dans autoTile\n");
+}
 
+void localAutoTile(Map map, int x, int y){
+	for (int i = x-1; i<=x+1; i++){
+		for (int j = y-1; j<=y+1; j++){
+			autoTile(map, i, j);
+		}
+	}
+}
 
-/*  Auto Tiling
-prend matrice tab de 0=air et 1=block
-revoie matrice correspondant avec le bon affichage
-*/
-
-void autoTile(Map map){
-
-	// pour les bords
+void completeAutoTile(Map map){
 	for (int i = 0; i<map.size.x; i++){
-		map.tiled[i*map.size.y] = FULL_WALL;
-		map.tiled[i*map.size.y + map.size.y-1] = FULL_WALL;
-	}
-	for (int j = 0; j<map.size.y; j++){
-		map.tiled[j] = FULL_WALL;
-		map.tiled[map.size.x-1 + j] = FULL_WALL;
-	}
-	
-	// pour le reste
-	for (int i = 1; i<map.size.x-1; i++){
-		for (int j = 1; j<map.size.y-1; j++){
-			// air
-            if (!map.data[i*map.size.y + j]){
-				map.tiled[i*map.size.y + j] = -1; // -1 pour l'air
-			}
-            // blocks partout autour
-			else if (	map.data[(i-1)*map.size.y + j-1] && map.data[i*map.size.y + j-1] && map.data[(i+1)*map.size.y + j-1] &&
-						map.data[(i-1)*map.size.y + j]   && 							    map.data[(i+1)*map.size.y + j]   &&
-						map.data[(i-1)*map.size.y + j+1] && map.data[i*map.size.y + j+1] && map.data[(i+1)*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = FULL_WALL ;
-			}
-            // U_WALL
-			else if (                                       !map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j]  && 							        map.data[(i+1)*map.size.y + j]   &&
-						                                    map.data[i*map.size.y + j+1]  ){
-				map.tiled[i*map.size.y + j] = U_WALL;
-			}
-			// D_WALL
-			else if (	                                map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = D_WALL;
-            }
-			// UD_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = UD_WALL;
-            }
-            // L_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = L_WALL;
-            }
-            // R_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = R_WALL;
-            }
-            // UDL_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = UDL_WALL;
-            }
-            // UDR_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = UDR_WALL;
-            }
-            // LU_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = LU_WALL;
-            }
-            // RU_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RU_WALL;
-            }
-            // LD_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = LD_WALL;
-            }
-            // RD_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RD_WALL;
-            }
-            // CLU_WALL
-            else if (	!map.data[(i-1)*map.size.y + j-1] && map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j]   && 							    map.data[(i+1)*map.size.y + j] &&
-						                                    map.data[i*map.size.y + j+1]  ){
-				map.tiled[i*map.size.y + j] = CLU_WALL ;
-			}
-            // CRU_WALL
-            else if (	                                    map.data[i*map.size.y + j-1] && !map.data[(i+1)*map.size.y + j-1] &&
-						map.data[(i-1)*map.size.y + j]   && 							    map.data[(i+1)*map.size.y + j]   &&
-						                                    map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = CRU_WALL ;
-			}
-            // CLD_WALL
-            else if (	                                    map.data[i*map.size.y + j-1] &&
-						map.data[(i-1)*map.size.y + j]   && 							    map.data[(i+1)*map.size.y + j]   &&
-						!map.data[(i-1)*map.size.y + j+1] && map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = CLD_WALL ;
-			}
-            // CRD_WALL
-            else if (	                                    map.data[i*map.size.y + j-1] && 
-						map.data[(i-1)*map.size.y + j]   && 							    map.data[(i+1)*map.size.y + j]   &&
-						                                    map.data[i*map.size.y + j+1] && !map.data[(i+1)*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = CRD_WALL ;
-			}
-            // RLU_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RLU_WALL;
-            }
-            // RL_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RL_WALL;
-            }
-            // RLD_WALL
-            else if (	                                map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RLD_WALL;
-            }
-            // RLUD_WALL
-            else if (	                                !map.data[i*map.size.y + j-1] && 
-						!map.data[(i-1)*map.size.y + j] && 							    !map.data[(i+1)*map.size.y + j] &&
-						                                !map.data[i*map.size.y + j+1] ){
-				map.tiled[i*map.size.y + j] = RLUD_WALL;
-            }
-            else printf("erreur dans autoTile\n");
+		for (int j = 0; j<map.size.y; j++){
+			autoTile(map, i, j);
 		}
 	}
 }
