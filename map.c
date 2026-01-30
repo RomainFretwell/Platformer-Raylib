@@ -20,51 +20,51 @@ void LoadMap(Map map, FILE* fp){
 void testMap(Map map){
     // map de test en attendant ...
     for (int i = 0; i < map.size.x; i++){
-        map.data[i*map.size.y + map.size.y - 1] = 1;
-		map.data[i*map.size.y + map.size.y - 2] = 1;
+        map.data[i*map.size.y + map.size.y - 1] = DARK_BRICKS;
+		map.data[i*map.size.y + map.size.y - 2] = DARK_BRICKS;
     }
     for (int i = 20; i < map.size.x; i++){
-        map.data[i*map.size.y + map.size.y - 3] = 1;
+        map.data[i*map.size.y + map.size.y - 3] = DARK_BRICKS;
     }
     for (int i = 100; i < map.size.x; i+=3){
-        map.data[i*map.size.y + map.size.y - 4] = 1;
+        map.data[i*map.size.y + map.size.y - 4] = DARK_BRICKS;
     }
     for (int i = 0; i < map.size.x; i++){
-        map.data[i*map.size.y] = 1;
-        map.data[i*map.size.y + 1] = 1;
+        map.data[i*map.size.y] = DARK_BRICKS;
+        map.data[i*map.size.y + 1] = DARK_BRICKS;
     }
     for (int j = 0; j < map.size.y; j++){
-        map.data[j] = 1;
-        map.data[j + map.size.y] = 1;
-        map.data[j + (map.size.x-1)*map.size.y] = 1;
-        map.data[j + (map.size.x-2)*map.size.y] = 1;
+        map.data[j] = DARK_BRICKS;
+        map.data[j + map.size.y] = DARK_BRICKS;
+        map.data[j + (map.size.x-1)*map.size.y] = DARK_BRICKS;
+        map.data[j + (map.size.x-2)*map.size.y] = DARK_BRICKS;
     }
 
     for (int i = 20; i < 25; i++){
-        map.data[i*map.size.y + 20] = 1;
-        map.data[i*map.size.y + 24] = 1;
+        map.data[i*map.size.y + 20] = DARK_BRICKS;
+        map.data[i*map.size.y + 24] = DARK_BRICKS;
     }
     for (int j = 21; j < 24; j++){
-        map.data[20*map.size.y + j] = 1;
-        map.data[24*map.size.y + j] = 1;
+        map.data[20*map.size.y + j] = DARK_BRICKS;
+        map.data[24*map.size.y + j] = DARK_BRICKS;
     }
 
     for (int i = 33; i < map.size.x; i++){
-        map.data[i*map.size.y + 15] = 1;
+        map.data[i*map.size.y + 15] = DARK_BRICKS;
     }
     for (int j = 15; j < 63; j++){
-        map.data[24*map.size.y + j] = 1;
-        map.data[32*map.size.y + j] = 1;
+        map.data[24*map.size.y + j] = DARK_BRICKS;
+        map.data[32*map.size.y + j] = DARK_BRICKS;
     }
 
     for (int i = 80; i < map.size.x; i+=7){
-        map.data[i*map.size.y + 30] = 1;
+        map.data[i*map.size.y + 30] = DARK_BRICKS;
     }
     
     for (int i = 0; i < 4; i++){
         for (int j = 0; j < 6; j++){
-            map.data[(50+i+8*j)*map.size.y + map.size.y-12 - 4*j] = 1;
-            map.data[(50+i+8*j)*map.size.y + 26 + 4*j] = 1;
+            map.data[(50+i+8*j)*map.size.y + map.size.y-12 - 4*j] = DARK_BRICKS;
+            map.data[(50+i+8*j)*map.size.y + 26 + 4*j] = DARK_BRICKS;
         }
     }
     
@@ -76,7 +76,7 @@ void autoTile(Map map, int x, int y){
         return;
     }
 
-    int material = map.data[x*map.size.y + y] + 1;
+    int material = map.data[x*map.size.y + y];
 
     // bords de la map
     if (x == 0 || x == map.size.x-1 || y == 0 || y == map.size.y-1){

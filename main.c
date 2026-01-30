@@ -61,7 +61,7 @@ int main(){
     testMap(mapDeTest);
     completeAutoTile(mapDeTest);
     
-    int selectedMaterial = DARK_BRICKS;
+    int selectedMaterial = DIRT;
     
     Color background_color = {220, 230, 255, 255};
 
