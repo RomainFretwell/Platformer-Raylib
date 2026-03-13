@@ -367,7 +367,7 @@ int main(){
         
         if (xT <= 250) xT++;
         updateTimer(&tweenTime);
-        int yT = (int) tweenPow(tweenTime.lifetime - tweenTime.timeleft, tweenTime.lifetime, 450.0f, 250.0f, 10.0f);
+        int yT = (int) tweenSmooth(tweenTime.lifetime - tweenTime.timeleft, tweenTime.lifetime, 450.0f, 250.0f, 5.0f);
         DrawRectangle(xT, yT, 10, 10, RED);
         if (IsKeyPressed(KEY_R)){
             xT = 50;

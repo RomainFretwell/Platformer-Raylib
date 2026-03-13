@@ -55,3 +55,10 @@ float tweenPow(float t, float duree, float initialValue, float finalValue, float
 float tweenRoot(float t, float duree, float initialValue, float finalValue, float ordre){
     return (finalValue-initialValue)*powf(t/duree, 1/ordre) + initialValue;
 }
+
+float tweenSmooth(float t, float duree, float initialValue, float finalValue, float ordre){
+    if (t <= 0) return initialValue;
+    if (t >= duree) return finalValue;
+    if (t <= duree/2) return (finalValue-initialValue)*powf(2*t/duree, ordre)/2 + initialValue;
+    return finalValue - (finalValue-initialValue)*powf(2-2*t/duree, ordre)/2;
+}
