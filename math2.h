@@ -14,6 +14,8 @@ float min(float a, float b);
 float max(float a, float b);
 int arrondir(float x);
 float approach(float current, float target, float increase);
-
+float tweenLinear(float t, float duree, float initialValue, float finalValue);
+float tweenPow(float t, float duree, float initialValue, float finalValue, float ordre);
+float tweenRoot(float t, float duree, float initialValue, float finalValue, float ordre);
 
 #endif // MATH2_H

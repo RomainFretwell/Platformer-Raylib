@@ -43,3 +43,15 @@ float approach(float current, float target, float increase){
     }
     return max(current - increase, target);
 }
+
+float tweenLinear(float t, float duree, float initialValue, float finalValue){
+	return (finalValue-initialValue)*t/duree + initialValue;
+}
+
+float tweenPow(float t, float duree, float initialValue, float finalValue, float ordre){
+	return (finalValue-initialValue)*powf(t/duree, ordre) + initialValue;
+}
+
+float tweenRoot(float t, float duree, float initialValue, float finalValue, float ordre){
+    return (finalValue-initialValue)*powf(t/duree, 1/ordre) + initialValue;
+}

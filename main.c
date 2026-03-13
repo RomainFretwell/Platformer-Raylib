@@ -159,6 +159,11 @@ int main(){
     float acceleration = gravity;
     bool showCross = false; // pour dessinà supprimer
     bool showDebugInfo = false;
+    
+    // tween test
+    int xT = 50;
+    Timer tweenTime = {1.0f, 0.0f};
+
 
     // time variables
     double deltaTime = 0.005;
@@ -357,6 +362,17 @@ int main(){
         //drawEntity(arrow);
         drawEntity(slime);
 
+
+        // test tween
+        
+        if (xT <= 250) xT++;
+        updateTimer(&tweenTime);
+        int yT = (int) tweenPow(tweenTime.lifetime - tweenTime.timeleft, tweenTime.lifetime, 450.0f, 250.0f, 10.0f);
+        DrawRectangle(xT, yT, 10, 10, RED);
+        if (IsKeyPressed(KEY_R)){
+            xT = 50;
+            startTimer(&tweenTime);
+        }
         
         if (showEntityHitbox){
             //drawHitbox(player.hitbox, RED);
