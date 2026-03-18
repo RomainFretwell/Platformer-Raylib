@@ -33,6 +33,7 @@ const float hangGravity = regularGravity / 2;
 const float hangBoostThresh = runSpeed * 0.1;
 const float hangBoost = runSpeed * 1.2;
 
+float coefJumpHeight = 0.5f;
 
 static void moveX(Entity *ent, Map map){
     ent->remain.x += ent->speed.x;
@@ -241,11 +242,6 @@ void mouvement(Entity *player, Map map){
 
     updateTimer(&noControlWallJumpTimer);
 
-    // controler la hauteur du saut en appuyant plus ou moins longtemps
-    if (!IsKeyDown(KEY_UP) && player->speed.y < -0.1f){
-        player->speed.y *= 0.5f;
-    }
-
     if (IsKeyDown(KEY_LEFT) && timerIsDone(&noControlWallJumpTimer)){
         
         if (player->grounded){
@@ -309,6 +305,11 @@ void mouvement(Entity *player, Map map){
     }
     else { // gravitée
         player->speed.y = approach(player->speed.y, fallSpeed, gravity * dt);
+    }
+
+    // controler la hauteur du saut en appuyant plus ou moins longtemps
+    if (!IsKeyDown(KEY_UP) && player->speed.y < -0.1f){
+        player->speed.y *= coefJumpHeight;
     }
     
     moveX(&(*player), map);
