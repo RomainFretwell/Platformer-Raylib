@@ -47,6 +47,7 @@ int main(){
     currentScreenSize = smallScreenSize;
     screenRatio = 1.0f;
     
+    Texture2D background_0 = LoadTexture("resources/background_0.png");
     // Map initialization
     Map mapDeTest = (Map){
         .worldType = 0, // forêt ?
@@ -61,10 +62,8 @@ int main(){
     testMap(mapDeTest);
     completeAutoTile(mapDeTest);
     
-    int selectedMaterial = DIRT;
+    int selectedMaterial = BLUE_BRICKS;
     
-    Color background_color = {220, 230, 255, 255};
-
     float gravity = 13.0f; //0.3f
 
     // player initialization
@@ -305,7 +304,8 @@ int main(){
         // ----------------------------------------------------------------------------------------
         BeginDrawing();
         
-        ClearBackground(background_color);
+        ClearBackground(WHITE);
+        DrawTextureEx(background_0, (Vector2){0, 0}, 0, screenRatio, WHITE);
         
 
         if (IsKeyPressed(KEY_P)){
@@ -458,6 +458,7 @@ int main(){
     UnloadTexture(bow.texture);
     UnloadTexture(arrow.texture);
     UnloadTexture(slime.texture);
+    UnloadTexture(background_0);
 
     CloseWindow();
 

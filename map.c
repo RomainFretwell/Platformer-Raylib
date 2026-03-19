@@ -20,51 +20,51 @@ void LoadMap(Map map, FILE* fp){
 void testMap(Map map){
     // map de test en attendant ...
     for (int i = 0; i < map.size.x; i++){
-        map.data[i*map.size.y + map.size.y - 1] = DARK_BRICKS;
-		map.data[i*map.size.y + map.size.y - 2] = DARK_BRICKS;
+        map.data[i*map.size.y + map.size.y - 1] = BLUE_BRICKS;
+		map.data[i*map.size.y + map.size.y - 2] = BLUE_BRICKS;
     }
     for (int i = 20; i < map.size.x; i++){
-        map.data[i*map.size.y + map.size.y - 3] = DARK_BRICKS;
+        map.data[i*map.size.y + map.size.y - 3] = BLUE_BRICKS;
     }
     for (int i = 100; i < map.size.x; i+=3){
-        map.data[i*map.size.y + map.size.y - 4] = DARK_BRICKS;
+        map.data[i*map.size.y + map.size.y - 4] = BLUE_BRICKS;
     }
     for (int i = 0; i < map.size.x; i++){
-        map.data[i*map.size.y] = DARK_BRICKS;
-        map.data[i*map.size.y + 1] = DARK_BRICKS;
+        map.data[i*map.size.y] = BLUE_BRICKS;
+        map.data[i*map.size.y + 1] = BLUE_BRICKS;
     }
     for (int j = 0; j < map.size.y; j++){
-        map.data[j] = DARK_BRICKS;
-        map.data[j + map.size.y] = DARK_BRICKS;
-        map.data[j + (map.size.x-1)*map.size.y] = DARK_BRICKS;
-        map.data[j + (map.size.x-2)*map.size.y] = DARK_BRICKS;
+        map.data[j] = BLUE_BRICKS;
+        map.data[j + map.size.y] = BLUE_BRICKS;
+        map.data[j + (map.size.x-1)*map.size.y] = BLUE_BRICKS;
+        map.data[j + (map.size.x-2)*map.size.y] = BLUE_BRICKS;
     }
 
     for (int i = 20; i < 25; i++){
-        map.data[i*map.size.y + 20] = DARK_BRICKS;
-        map.data[i*map.size.y + 24] = DARK_BRICKS;
+        map.data[i*map.size.y + 20] = BLUE_BRICKS;
+        map.data[i*map.size.y + 24] = BLUE_BRICKS;
     }
     for (int j = 21; j < 24; j++){
-        map.data[20*map.size.y + j] = DARK_BRICKS;
-        map.data[24*map.size.y + j] = DARK_BRICKS;
+        map.data[20*map.size.y + j] = BLUE_BRICKS;
+        map.data[24*map.size.y + j] = BLUE_BRICKS;
     }
 
     for (int i = 33; i < map.size.x; i++){
-        map.data[i*map.size.y + 15] = DARK_BRICKS;
+        map.data[i*map.size.y + 15] = BLUE_BRICKS;
     }
     for (int j = 15; j < 63; j++){
-        map.data[24*map.size.y + j] = DARK_BRICKS;
-        map.data[32*map.size.y + j] = DARK_BRICKS;
+        map.data[24*map.size.y + j] = BLUE_BRICKS;
+        map.data[32*map.size.y + j] = BLUE_BRICKS;
     }
 
     for (int i = 80; i < map.size.x; i+=7){
-        map.data[i*map.size.y + 30] = DARK_BRICKS;
+        map.data[i*map.size.y + 30] = BLUE_BRICKS;
     }
     
     for (int i = 0; i < 4; i++){
         for (int j = 0; j < 6; j++){
-            map.data[(50+i+8*j)*map.size.y + map.size.y-12 - 4*j] = DARK_BRICKS;
-            map.data[(50+i+8*j)*map.size.y + 26 + 4*j] = DARK_BRICKS;
+            map.data[(50+i+8*j)*map.size.y + map.size.y-12 - 4*j] = BLUE_BRICKS;
+            map.data[(50+i+8*j)*map.size.y + 26 + 4*j] = BLUE_BRICKS;
         }
     }
     

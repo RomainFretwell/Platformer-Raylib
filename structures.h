@@ -112,8 +112,8 @@ typedef struct {
 // Material
 typedef enum {
     AIR = 0,
-    DIRT = 1,
-    DARK_BRICKS = 2,
+    BLUE_BRICKS = 1,
+    DIRT = 2,
 } Matter;
 
 
