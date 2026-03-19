@@ -304,7 +304,7 @@ int main(){
         // ----------------------------------------------------------------------------------------
         BeginDrawing();
         
-        ClearBackground(WHITE);
+        ClearBackground((Color){32, 36, 85, 255});
         DrawTextureEx(background_0, (Vector2){0, 0}, 0, screenRatio, WHITE);
         
 
