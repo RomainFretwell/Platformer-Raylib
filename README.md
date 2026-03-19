@@ -9,8 +9,7 @@ Objectif : faire un platformer dédié au speedrun dans un univers cyberpunk. Il
 
 ## TODO
 - Faire idle du perso
-- Finir de dessiner une tileset
-- Dessiner un background de ville futuriste
-- Dessiner d'autres couche du back ground pour faire du paralaxing
+- Finir de dessiner background de ville futuriste
+- Exporter BG en plusieurs couches + coder parallax
 - Faire tableau d'animation avec comme index : AnimationState animState
 - Retrouver de bonnes valeurs pour avoir un mouvement sympa 
