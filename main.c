@@ -72,11 +72,11 @@ int main(){
         .speed = (Vector2){0.0f, 0.0f},
         .angle = 0.0f,
         .direction = RIGHT,
-        .texture = LoadTexture("resources/Player_Atlas.png"),
+        .texture = LoadTexture("resources/Player_Idle.png"),
 
         // physics box
-        .physicsBox.width = 18,
-        .physicsBox.height = 52,
+        .physicsBox.width = 14,
+        .physicsBox.height = 32,
         .physicsBox.x = player.position.x - player.physicsBox.width/2,
         .physicsBox.y = player.position.y - player.physicsBox.height/2,
         .remain = (Vector2){0.0f,0.0f},
@@ -86,11 +86,11 @@ int main(){
         .animState = IDLE,
         .animation.type = REPEATING,
         .animation.first = 0,
-        .animation.last = 8, // nbFrames - 1
+        .animation.last = 10, // nbFrames - 1
         .animation.current = player.animation.first,
         .animation.step = 1,
-        .animation.frameSize = (IntVector2){32,64},
-        .animation.origin = (IntVector2){17, 32},
+        .animation.frameSize = (IntVector2){64,48},
+        .animation.origin = (IntVector2){32, 24},
         .animation.timer = (Timer){0.15f, 0.0f},
     };
     
