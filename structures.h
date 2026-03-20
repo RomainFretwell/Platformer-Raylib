@@ -108,6 +108,24 @@ typedef struct {
     bool grounded;
 } Entity;
 
+// Saw
+typedef struct {
+    IntVector2 position;
+    IntVector2 posTab[30];
+    int nbMoves;
+    int moveState;
+    Timer timeTab[30];
+    int speed;
+
+    Rectangle hitbox;
+
+    int damage;
+    Timer damageCooldown;
+
+    Texture2D texture;
+    AnimationState animState;
+    Animation animation;
+} Saw;
 
 // Material
 typedef enum {

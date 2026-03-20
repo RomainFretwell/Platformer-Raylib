@@ -31,6 +31,47 @@ void ToggleFullscreenWindow(){
     screenRatio = currentScreenSize.x / smallScreenSize.x;
 }
 
+void initSawTimers(Saw* saw){
+    for (int i = 0; i<saw->nbMoves; i++){
+        float d = distance(saw->posTab[i%saw->nbMoves], saw->posTab[(i+1)%saw->nbMoves]);
+        saw->timeTab[i] = (Timer){d/saw->speed, 0.0f};
+    }
+}
+
+void moveSaw(Saw* saw){
+    updateTimer(&saw->timeTab[saw->moveState]);
+    if (timerIsDone(&saw->timeTab[saw->moveState])){
+        saw->moveState = (saw->moveState + 1)%saw->nbMoves;
+        startTimer(&saw->timeTab[saw->moveState]);
+    }
+    int ordre = 2;
+    saw->position.x = tweenSmooth(saw->timeTab[saw->moveState].lifetime - saw->timeTab[saw->moveState].timeleft, saw->timeTab[saw->moveState].lifetime, saw->posTab[(saw->moveState)%saw->nbMoves].x, saw->posTab[(saw->moveState + 1)%saw->nbMoves].x, ordre);
+    saw->position.y = tweenSmooth(saw->timeTab[saw->moveState].lifetime - saw->timeTab[saw->moveState].timeleft, saw->timeTab[saw->moveState].lifetime, saw->posTab[(saw->moveState)%saw->nbMoves].y, saw->posTab[(saw->moveState + 1)%saw->nbMoves].y, ordre);
+}
+
+void initSawCircleFormation(int nbSaw, Saw sawTab[nbSaw], IntVector2 pos, int rayon, int skip, int speed, Texture2D texture){
+    for (int i = 0; i < nbSaw; i++){
+        for (int j = 0; j < nbSaw; j++){
+            int n = skip*j + i;
+            sawTab[i].posTab[j] = (IntVector2){pos.x + rayon*sinf(n*2*PI/nbSaw), pos.y + rayon*cosf(n*2*PI/nbSaw)};
+        }
+        // animation
+        sawTab[i].animState = IDLE,
+        sawTab[i].animation.type = REPEATING;
+        sawTab[i].animation.first = 0;
+        sawTab[i].animation.last = 0; // nbFrames - 1
+        sawTab[i].animation.current = 0;
+        sawTab[i].animation.step = 1;
+        sawTab[i].animation.frameSize = (IntVector2){32,32};
+        sawTab[i].animation.origin = (IntVector2){16, 16};
+        sawTab[i].animation.timer = (Timer){0.15f, 0.0f};
+        sawTab[i].texture = texture;
+        sawTab[i].moveState = 0;
+        sawTab[i].nbMoves = nbSaw;
+        sawTab[i].speed = speed;
+        initSawTimers(&(sawTab[i]));
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 //
@@ -47,13 +88,21 @@ int main(){
     currentScreenSize = smallScreenSize;
     screenRatio = 1.0f;
     
-    Texture2D background_0 = LoadTexture("resources/background_0.png");
+    // Texture loading
+    Texture2D Texture_background_0 = LoadTexture("resources/background_0.png");
+    Texture2D Texture_Block_Atlas = LoadTexture("resources/Block_Atlas.png");
+    Texture2D Texture_Player_Idle = LoadTexture("resources/Player_Idle.png");
+    Texture2D Texture_Hologram_Saw = LoadTexture("resources/Hologram_Saw.png");
+    Texture2D Texture_bow = LoadTexture("resources/bow.png");
+    Texture2D Texture_arrow = LoadTexture("resources/arrow.png");
+    Texture2D Texture_green_slime_idle = LoadTexture("resources/green_slime_idle.png");
+
     // Map initialization
     Map mapDeTest = (Map){
         .worldType = 0, // forêt ?
         .size.x = 150,
         .size.y = 70,
-        .tileSet.texture = LoadTexture("resources/Block_Atlas.png"),
+        .tileSet.texture = Texture_Block_Atlas,
         .tileSet.size = (IntVector2){20, 1},
         .data = malloc(sizeof(int) * mapDeTest.size.x * mapDeTest.size.y),
         .tiled = malloc(sizeof(int) * mapDeTest.size.x * mapDeTest.size.y),
@@ -72,7 +121,7 @@ int main(){
         .speed = (Vector2){0.0f, 0.0f},
         .angle = 0.0f,
         .direction = RIGHT,
-        .texture = LoadTexture("resources/Player_Idle.png"),
+        .texture = Texture_Player_Idle,
 
         // physics box
         .physicsBox.width = 14,
@@ -93,10 +142,45 @@ int main(){
         .animation.origin = (IntVector2){32, 24},
         .animation.timer = (Timer){0.15f, 0.0f},
     };
+
+    // saw initialization
+    Saw saw = (Saw){
+        .position = (IntVector2){500, 200},
+        .nbMoves = 4,
+        .moveState = 0,
+        .speed = 300, // à changer
+
+        .hitbox = (Rectangle){338, 238, 24, 24},
+        .damage = 5,
+
+        .texture = Texture_Hologram_Saw,
+
+        // animation
+        .animState = IDLE,
+        .animation.type = REPEATING,
+        .animation.first = 0,
+        .animation.last = 0, // nbFrames - 1
+        .animation.current = saw.animation.first,
+        .animation.step = 1,
+        .animation.frameSize = (IntVector2){32,32},
+        .animation.origin = (IntVector2){16, 16},
+        .animation.timer = (Timer){0.15f, 0.0f},
+    };
+
+    saw.posTab[0] = saw.position;
+    saw.posTab[1] = (IntVector2){saw.position.x + 400, saw.position.y};
+    saw.posTab[2] = (IntVector2){saw.position.x + 400, saw.position.y - 100};
+    saw.posTab[3] = (IntVector2){saw.position.x + 200, saw.position.y};
+    
+    initSawTimers(&saw);
+
+    int nbSawTest = 5;
+    Saw tabSawTest[nbSawTest];
+    initSawCircleFormation(nbSawTest, tabSawTest, (IntVector2){800, 700}, 300, 2, 200, Texture_Hologram_Saw);
     
     // bow
     Entity bow = (Entity){
-        .texture = LoadTexture("resources/bow.png"),
+        .texture = Texture_bow,
         .position = (IntVector2){(currentScreenSize.x-bow.texture.width)/2, (currentScreenSize.y-bow.texture.height)/2},
         .speed = player.speed,
         .angle = 135.0f,
@@ -110,13 +194,13 @@ int main(){
         .speed = player.speed,
         .angle = 0.0f,
         .direction = RIGHT,
-        .texture = LoadTexture("resources/arrow.png"),
+        .texture = Texture_arrow,
         .animation.origin = (IntVector2){2, 14},
     };
     
     // slime
     Entity slime = (Entity){
-        .texture = LoadTexture("resources/green_slime_idle.png"),
+        .texture = Texture_green_slime_idle,
         .position = (IntVector2){330, 180},
         .speed = (Vector2){0.0f, 0.0f},
         .angle = 0.0f,
@@ -158,11 +242,6 @@ int main(){
     float acceleration = gravity;
     bool showCross = false; // pour dessinà supprimer
     bool showDebugInfo = false;
-    
-    // tween test
-    int xT = 50;
-    Timer tweenTime = {1.0f, 0.0f};
-
 
     // time variables
     double deltaTime = 0.005;
@@ -297,6 +376,10 @@ int main(){
 
         updateAnimation(&player.animation);
         updateAnimation(&slime.animation);
+        updateAnimation(&saw.animation);
+        for (int i=0; i<nbSawTest; i++){
+            updateAnimation(&tabSawTest[i].animation);
+        }
 
 
         // ----------------------------------------------------------------------------------------
@@ -305,7 +388,7 @@ int main(){
         BeginDrawing();
         
         ClearBackground((Color){32, 36, 85, 255});
-        DrawTextureEx(background_0, (Vector2){0, 0}, 0, screenRatio, WHITE);
+        DrawTextureEx(Texture_background_0, (Vector2){0, 0}, 0, screenRatio, WHITE);
         
 
         if (IsKeyPressed(KEY_P)){
@@ -362,17 +445,15 @@ int main(){
         //drawEntity(arrow);
         drawEntity(slime);
 
+        moveSaw(&saw);
+        DrawTextureEx(saw.texture, (Vector2){saw.position.x * screenRatio, saw.position.y * screenRatio}, 0, screenRatio, WHITE);
 
-        // test tween
-        
-        if (xT <= 250) xT++;
-        updateTimer(&tweenTime);
-        int yT = (int) tweenSmooth(tweenTime.lifetime - tweenTime.timeleft, tweenTime.lifetime, 450.0f, 250.0f, 5.0f);
-        DrawRectangle(xT, yT, 10, 10, RED);
-        if (IsKeyPressed(KEY_R)){
-            xT = 50;
-            startTimer(&tweenTime);
+        // test scie en étoile
+        for (int i=0; i<nbSawTest; i++){
+            moveSaw(&tabSawTest[i]);
+            DrawTextureEx(Texture_Hologram_Saw, (Vector2){tabSawTest[i].position.x * screenRatio, tabSawTest[i].position.y * screenRatio}, 0, screenRatio, WHITE);
         }
+        
         
         if (showEntityHitbox){
             //drawHitbox(player.hitbox, RED);
@@ -453,12 +534,14 @@ int main(){
     free(mapDeTest.data);
     free(mapDeTest.tiled);
 
-    UnloadTexture(mapDeTest.tileSet.texture);
-    UnloadTexture(player.texture);
-    UnloadTexture(bow.texture);
-    UnloadTexture(arrow.texture);
-    UnloadTexture(slime.texture);
-    UnloadTexture(background_0);
+    UnloadTexture(Texture_background_0);
+    UnloadTexture(Texture_Block_Atlas);
+    UnloadTexture(Texture_Player_Idle);
+    UnloadTexture(Texture_Hologram_Saw);
+    UnloadTexture(Texture_bow);
+    UnloadTexture(Texture_arrow);
+    UnloadTexture(Texture_green_slime_idle);
+
 
     CloseWindow();
 
