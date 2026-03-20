@@ -387,7 +387,7 @@ int main(){
 
         // test croix player
         if (showCross){
-            drawCross(player.position.x, player.position.y, BLACK);
+            drawCross(player.position.x, player.position.y, WHITE);
         }
 
         EndMode2D();
@@ -406,42 +406,42 @@ int main(){
         if (showDebugInfo){
             DrawFPS(10, 10);
             const char * test1 = TextFormat("World position X = %d", player.position.x);
-            DrawText(test1, 10, 50, 20, BLACK);
+            DrawText(test1, 10, 50, 20, WHITE);
             const char * test2 = TextFormat("World position Y = %d", player.position.y);
-            DrawText(test2, 10, 70, 20, BLACK);
+            DrawText(test2, 10, 70, 20, WHITE);
             Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
             const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
-            DrawText(test01, 10, 90, 20, BLACK);
+            DrawText(test01, 10, 90, 20, WHITE);
             const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
-            DrawText(test02, 10, 110, 20, BLACK);
+            DrawText(test02, 10, 110, 20, WHITE);
             const char * test3 = TextFormat("speed X = %f", player.speed.x);
-            DrawText(test3, 10, 130, 20, BLACK);
+            DrawText(test3, 10, 130, 20, WHITE);
             const char * test4 = TextFormat("speed Y = %f", player.speed.y);
-            DrawText(test4, 10, 150, 20, BLACK);
+            DrawText(test4, 10, 150, 20, WHITE);
         }
         
         // test mouse
         const char * test5 = TextFormat("mouse SCREEN\nX = %f\nY = %f", GetMousePosition().x/screenRatio, GetMousePosition().y/screenRatio);
-        DrawText(test5, 400, 50, 20, BLACK);
+        DrawText(test5, 400, 50, 20, WHITE);
         const char * test6 = TextFormat("camera target\nX = %f\nY = %f", camera.target.x, camera.target.y);
-        DrawText(test6, 400, 150, 20, BLACK);
+        DrawText(test6, 400, 150, 20, WHITE);
         //const char * test7 = TextFormat("camera offset\nX = %f\nY = %f", camera.offset.x, camera.offset.y);
-        //DrawText(test7, 400, 250, 20, BLACK);
+        //DrawText(test7, 400, 250, 20, WHITE);
 
         /* test arrow
         // test arrow
         const char * test8 = TextFormat("Arrow speed X = %f", arrow.speed.x);
-        DrawText(test8, 500, 50, 20, BLACK);
+        DrawText(test8, 500, 50, 20, WHITE);
         const char * test9 = TextFormat("Arrow speed Y = %f", arrow.speed.y);
-        DrawText(test9, 500, 70, 20, BLACK);
+        DrawText(test9, 500, 70, 20, WHITE);
         const char * test10 = TextFormat("Arrow position X = %d", arrow.position.x);
-        DrawText(test10, 500, 90, 20, BLACK);
+        DrawText(test10, 500, 90, 20, WHITE);
         const char * test11 = TextFormat("Arrow position Y = %d", arrow.position.y);
-        DrawText(test11, 500, 110, 20, BLACK);
+        DrawText(test11, 500, 110, 20, WHITE);
         const char * test12 = TextFormat("Arrow angle = %d", arrow.angle);
-        DrawText(test12, 500, 130, 20, BLACK);
+        DrawText(test12, 500, 130, 20, WHITE);
         const char * test15 = TextFormat("Bow speed Y = %f", bow.speed.y);
-        DrawText(test15, 500, 150, 20, BLACK);
+        DrawText(test15, 500, 150, 20, WHITE);
         */
         
         

@@ -42,7 +42,7 @@ void drawMap(Map map){
                 variant = map.tiled[index] % map.tileSet.size.x;
                 if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
                     drawBlock(map.tileSet, x, y, material, variant);
-                    drawBlockHitbox(x, y, BLACK);
+                    drawBlockHitbox(x, y, WHITE);
                 }
             }
         }
