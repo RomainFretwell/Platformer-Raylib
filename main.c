@@ -156,7 +156,7 @@ int main(){
         .animation.timer = (Timer){0.15f, 0.0f},
 
         .maxHealth = 100,
-        .health = player.maxHealth,
+        .health = 80,
     };
 
     // saw initialization
@@ -489,42 +489,61 @@ int main(){
 
         EndMode2D();
 
-
+        // affichage barre de vie
+        DrawRectangleLinesEx((Rectangle){currentScreenSize.x - screenRatio*150, screenRatio*10, screenRatio*140, screenRatio*10}, screenRatio, WHITE);
+        DrawRectangle(currentScreenSize.x - screenRatio*149, screenRatio*11, screenRatio*138*player.health/player.maxHealth, screenRatio*8, (Color){0, 140, 0, 200});
+        const char * textPV = TextFormat("%d PV", player.health);
+        DrawText(textPV, currentScreenSize.x - screenRatio*148, 12*screenRatio, 7*screenRatio, WHITE);
+        
         // ----------------------------------------------------------------------------------------
         //                                 DEBUG INFO
         // ----------------------------------------------------------------------------------------
 
-        if (showEntityHitbox){
-            const char * test0 = TextFormat("entity hitbox ON");
-            DrawText(test0, currentScreenSize.x - 180, 10, 20, RED);
-        }
-
         // test player
         if (showDebugInfo){
+            
             DrawFPS(10, 10);
+            if (showEntityHitbox){
+                const char * test0 = TextFormat("entity hitbox ON");
+                DrawText(test0, 110, 7, 21, RED);
+            }
+            int debugX = 10;
+            int debugY = 35;
+            int debugSpace = 8;
+            int debugFontSize = screenRatio * 7;
             const char * test1 = TextFormat("World position X = %d", player.position.x);
-            DrawText(test1, 10, 50, 20, WHITE);
+            DrawText(test1, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
             const char * test2 = TextFormat("World position Y = %d", player.position.y);
-            DrawText(test2, 10, 70, 20, WHITE);
+            DrawText(test2, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
             Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
             const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
-            DrawText(test01, 10, 90, 20, WHITE);
+            DrawText(test01, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
             const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
-            DrawText(test02, 10, 110, 20, WHITE);
+            DrawText(test02, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
             const char * test3 = TextFormat("speed X = %f", player.speed.x);
-            DrawText(test3, 10, 130, 20, WHITE);
+            DrawText(test3, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
             const char * test4 = TextFormat("speed Y = %f", player.speed.y);
-            DrawText(test4, 10, 150, 20, WHITE);
+            DrawText(test4, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace * 2;
+            // test mouse
+            const char * test5 = TextFormat("mouse SCREEN : X = %f  Y = %f", GetMousePosition().x/screenRatio, GetMousePosition().y/screenRatio);
+            DrawText(test5, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
+            const char * test6 = TextFormat("camera target : X = %f  Y = %f", camera.target.x, camera.target.y);
+            DrawText(test6, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
+            const char * test7 = TextFormat("camera offset : X = %f  Y = %f", camera.offset.x, camera.offset.y);
+            DrawText(test7, debugX, debugY, debugFontSize, WHITE);
+            debugY += screenRatio*debugSpace;
         }
         
-        // test mouse
-        const char * test5 = TextFormat("mouse SCREEN\nX = %f\nY = %f", GetMousePosition().x/screenRatio, GetMousePosition().y/screenRatio);
-        DrawText(test5, 400, 50, 20, WHITE);
-        const char * test6 = TextFormat("camera target\nX = %f\nY = %f", camera.target.x, camera.target.y);
-        DrawText(test6, 400, 150, 20, WHITE);
-        //const char * test7 = TextFormat("camera offset\nX = %f\nY = %f", camera.offset.x, camera.offset.y);
-        //DrawText(test7, 400, 250, 20, WHITE);
-
+        
+        
         /* test arrow
         // test arrow
         const char * test8 = TextFormat("Arrow speed X = %f", arrow.speed.x);
