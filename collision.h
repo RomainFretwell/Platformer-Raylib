@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "raylib.h"
 #include "structures.h"
-#include "constants.h"
+#include "global.h"
 #include "math2.h"
 #include "draw.h" // à enlever après ?
 

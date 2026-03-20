@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "raylib.h"
 #include "structures.h"
-#include "constants.h"
+#include "global.h"
 #include "animation.h"
 
 void drawCross(int x, int y, Color color);

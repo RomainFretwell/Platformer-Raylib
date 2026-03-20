@@ -2,10 +2,8 @@
 #define MAP_H
 
 #include <stdio.h>
-//#include <stdlib.h>
-//#include "raylib.h"
 #include "structures.h"
-#include "constants.h"
+#include "global.h"
 
 void clearMap(Map map);
 void LoadMap(Map map, FILE* fp);

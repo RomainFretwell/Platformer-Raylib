@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
-#include "constants.h"
+#include "global.h"
 #include "structures.h"
 #include "math2.h"
 #include "collision.h"
