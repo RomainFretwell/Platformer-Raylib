@@ -106,7 +106,11 @@ typedef struct {
     
     Vector2 remain;
     bool grounded;
+
+    int health;
+    int maxHealth;
 } Entity;
+
 
 // Saw
 typedef struct {
@@ -126,6 +130,7 @@ typedef struct {
     AnimationState animState;
     Animation animation;
 } Saw;
+
 
 // Material
 typedef enum {

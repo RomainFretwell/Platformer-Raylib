@@ -8,7 +8,6 @@ Objectif : faire un platformer dédié au speedrun dans un univers cyberpunk. Il
 - on multiplie position par screenRatio donc on bouge de 3 pixels à chaque fois en grand écran (même si pas le vrai problème car on peut aussi voir sacadé en petit écran)
 
 ## TODO
-- Faire idle du perso
 - Finir de dessiner background de ville futuriste
 - Exporter BG en plusieurs couches + coder parallax
 - Faire tableau d'animation avec comme index : AnimationState animState

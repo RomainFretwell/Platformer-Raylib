@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "raylib.h"
 #include "structures.h"
-#include "constants.h"
+#include "global.h"
 #include "math2.h"
 #include "map.h"
 #include "draw.h"
@@ -14,6 +14,26 @@
 // ----------------------------------------------------------------------------------------
 //                                   Game functions
 // ----------------------------------------------------------------------------------------
+
+void LoadAllTextures(){
+    Texture_background_0 = LoadTexture("resources/background_0.png");
+    Texture_Block_Atlas = LoadTexture("resources/Block_Atlas.png");
+    Texture_Player_Idle = LoadTexture("resources/Player_Idle.png");
+    Texture_Hologram_Saw = LoadTexture("resources/Hologram_Saw.png");
+    Texture_bow = LoadTexture("resources/bow.png");
+    Texture_arrow = LoadTexture("resources/arrow.png");
+    Texture_green_slime_idle = LoadTexture("resources/green_slime_idle.png");
+}
+
+void UnloadAllTextures(){
+    UnloadTexture(Texture_background_0);
+    UnloadTexture(Texture_Block_Atlas);
+    UnloadTexture(Texture_Player_Idle);
+    UnloadTexture(Texture_Hologram_Saw);
+    UnloadTexture(Texture_bow);
+    UnloadTexture(Texture_arrow);
+    UnloadTexture(Texture_green_slime_idle);
+}
 
 void ToggleFullscreenWindow(){
     if (!IsWindowFullscreen()){
@@ -88,15 +108,8 @@ int main(){
     currentScreenSize = smallScreenSize;
     screenRatio = 1.0f;
     
-    // Texture loading
-    Texture2D Texture_background_0 = LoadTexture("resources/background_0.png");
-    Texture2D Texture_Block_Atlas = LoadTexture("resources/Block_Atlas.png");
-    Texture2D Texture_Player_Idle = LoadTexture("resources/Player_Idle.png");
-    Texture2D Texture_Hologram_Saw = LoadTexture("resources/Hologram_Saw.png");
-    Texture2D Texture_bow = LoadTexture("resources/bow.png");
-    Texture2D Texture_arrow = LoadTexture("resources/arrow.png");
-    Texture2D Texture_green_slime_idle = LoadTexture("resources/green_slime_idle.png");
-
+    LoadAllTextures();
+    
     // Map initialization
     Map mapDeTest = (Map){
         .worldType = 0, // forêt ?
@@ -141,6 +154,9 @@ int main(){
         .animation.frameSize = (IntVector2){64,48},
         .animation.origin = (IntVector2){32, 24},
         .animation.timer = (Timer){0.15f, 0.0f},
+
+        .maxHealth = 100,
+        .health = player.maxHealth,
     };
 
     // saw initialization
@@ -534,14 +550,7 @@ int main(){
     free(mapDeTest.data);
     free(mapDeTest.tiled);
 
-    UnloadTexture(Texture_background_0);
-    UnloadTexture(Texture_Block_Atlas);
-    UnloadTexture(Texture_Player_Idle);
-    UnloadTexture(Texture_Hologram_Saw);
-    UnloadTexture(Texture_bow);
-    UnloadTexture(Texture_arrow);
-    UnloadTexture(Texture_green_slime_idle);
-
+    UnloadAllTextures();
 
     CloseWindow();
 
