@@ -13,6 +13,8 @@ extern IntVector2 smallScreenSize;
 extern IntVector2 currentScreenSize;
 extern float screenRatio;
 
+extern float deltaTime;
+
 extern bool showBlockHitbox;
 extern bool showEntityHitbox;
 
@@ -21,8 +23,6 @@ extern Texture2D Texture_background_0;
 extern Texture2D Texture_Block_Atlas;
 extern Texture2D Texture_Player_Idle;
 extern Texture2D Texture_Hologram_Saw;
-extern Texture2D Texture_bow;
-extern Texture2D Texture_arrow;
 extern Texture2D Texture_green_slime_idle;
 
 

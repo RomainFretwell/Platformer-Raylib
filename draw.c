@@ -1,8 +1,8 @@
 #include "draw.h"
 
 void drawCross(int x, int y, Color color){
-    DrawLine(0, y*screenRatio, 2500*screenRatio, y*screenRatio, color); // currentScreenSize.x à la place de 1000
-    DrawLine(x*screenRatio, 0, x*screenRatio, 1200*screenRatio, color); // currentScreenSize.y
+    DrawLine(0, y*screenRatio, currentScreenSize.x, y*screenRatio, color);
+    DrawLine(x*screenRatio, 0, x*screenRatio, currentScreenSize.y, color);
 }
 
 void drawBlock(TileSet tileSet, int x, int y, int material, int variant){
@@ -33,28 +33,15 @@ void drawMap(Map map){
     int index;
     int material;
     int variant;
-
-    if (showBlockHitbox){
-        for (int x = 0; x < map.size.x; x++){
-            for (int y = 0; y < map.size.y; y++){
-                index = x*map.size.y + y;
-                material = map.tiled[index] / map.tileSet.size.x;
-                variant = map.tiled[index] % map.tileSet.size.x;
-                if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
-                    drawBlock(map.tileSet, x, y, material, variant);
+    for (int x = 0; x < map.size.x; x++){
+        for (int y = 0; y < map.size.y; y++){
+            index = x*map.size.y + y;
+            material = map.tiled[index] / map.tileSet.size.x;
+            variant = map.tiled[index] % map.tileSet.size.x;
+            if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
+                drawBlock(map.tileSet, x, y, material, variant);
+                if (showBlockHitbox){
                     drawBlockHitbox(x, y, WHITE);
-                }
-            }
-        }
-    }
-    else {
-        for (int x = 0; x < map.size.x; x++){
-            for (int y = 0; y < map.size.y; y++){
-                index = x*map.size.y + y;
-                material = map.tiled[index] / map.tileSet.size.x;
-                variant = map.tiled[index] % map.tileSet.size.x;
-                if (map.tiled[index] >= 0){ // if solid (càd pas de l'air ou de l'eau)
-                    drawBlock(map.tileSet, x, y, material, variant);
                 }
             }
         }
@@ -89,18 +76,5 @@ void drawEntity(Entity ent){
     else printf("erreur drawEntity\n");
     origin.y = ent.animation.origin.y * screenRatio;
     
-    DrawTexturePro(ent.texture, source, dest, origin, ent.angle, WHITE);
-}
-
-void drawItem(Item item){
-    int size = 1;
-    DrawTexturePro( item.texture,
-                    (Rectangle) {0, 0, item.texture.width, item.texture.height}, // source
-                    (Rectangle) {(item.position.x + item.texture.width/2)*screenRatio,
-                                (item.position.y + item.texture.height/2)*screenRatio,
-                                size*item.texture.width*screenRatio,
-                                size*item.texture.height*screenRatio}, // dest
-                    (Vector2) {item.texture.width/2 * screenRatio, item.texture.height/2 * screenRatio}, // origin
-                    item.angle, 
-                    WHITE);
+    DrawTexturePro(ent.texture, source, dest, origin, 0.0f, WHITE);
 }

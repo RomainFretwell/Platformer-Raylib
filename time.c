@@ -22,7 +22,7 @@ void updateTimer(Timer* timer){
         return;
     }
     if (timer->timeleft > 0.0f){
-        timer->timeleft -= GetFrameTime();
+        timer->timeleft -= deltaTime;
     }
 }
 

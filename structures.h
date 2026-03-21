@@ -95,7 +95,6 @@ typedef struct {
     //const float fallSpeed;
     //const float jumpSpeed;
     
-    float angle;
     Direction direction;
 
     Hitbox hitbox; // pour collisions avec entity
@@ -188,26 +187,6 @@ typedef struct{
     int* data; // data[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
     int* tiled; // tiled[MAX_MAP_SIZE_X * MAX_MAP_SIZE_Y];
 } Map;
-
-
-// Block
-//typedef struct {
-//    Texture2D texture;
-//    bool solid;
-//    bool breakable;
-//    float coefRebond;
-//} Block;
-
-
-// Item
-typedef struct {
-    IntVector2 position;
-    Vector2 speed;
-    Vector2 acceleration;
-    float angle;
-    Texture2D texture;
-    Hitbox hitbox;
-} Item;
 
 
 #endif // STRUCTURES_H

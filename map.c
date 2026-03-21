@@ -9,13 +9,13 @@ void clearMap(Map map){
     }
 }
 
-void LoadMap(Map map, FILE* fp){
-    for (int x = 0; x < map.size.x; x++){
-        for (int y = 0; y < map.size.y; y++){
-            map.tiled[x*map.size.y + y] = 0; // changer pour copier ou upload tableau d'un autre fichier (faire un dossier map)
-        }
-    }
-}
+//void LoadMap(Map map, FILE* fp){
+//    for (int x = 0; x < map.size.x; x++){
+//        for (int y = 0; y < map.size.y; y++){
+//            map.tiled[x*map.size.y + y] = 0; // changer pour copier ou upload tableau d'un autre fichier (faire un dossier map)
+//        }
+//    }
+//}
 
 void testMap(Map map){
     // map de test en attendant ...

@@ -22,16 +22,15 @@ void cameraFollow(Camera2D * camera, Entity player){
 }
 
 void cameraFollow2(Camera2D * camera, Entity player){
-    float dt = GetFrameTime();
     float cameraAcceleration = 0.04f;
     float offset = 100;
     float cameraSpeed = 100;
     
     if (player.speed.x == 0){
-        camera->target.x = approach(camera->target.x, player.position.x*screenRatio, cameraSpeed * dt);
+        camera->target.x = approach(camera->target.x, player.position.x*screenRatio, cameraSpeed * deltaTime);
     }
     else {
-        camera->target.x = approach(camera->target.x, (player.position.x + player.direction*offset)*screenRatio, cameraSpeed * dt);
+        camera->target.x = approach(camera->target.x, (player.position.x + player.direction*offset)*screenRatio, cameraSpeed * deltaTime);
     }
     
     camera->target.y += cameraAcceleration * (player.position.y*screenRatio - camera->target.y);
@@ -52,6 +51,6 @@ void limitCameraFollow(Camera2D * camera, Entity player, int cameraFollowThresh)
     }
 }
 
-void shakeCamera(Camera2D * camera, float intensity, float duration){
-    // TODO
-}
+//void shakeCamera(Camera2D * camera, float intensity, float duration){
+//    // TODO
+//}

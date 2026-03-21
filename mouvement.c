@@ -153,9 +153,7 @@ bool isWallSliding(Entity *player, Map map){
 }
 
 void mouvement(Entity *player, Map map){
-    
-    float dt = GetFrameTime();
-    
+        
     // regarde la bonne direction
     if (player->speed.x > 0){
         player->direction = RIGHT;
@@ -252,8 +250,8 @@ void mouvement(Entity *player, Map map){
         if(player->speed.x > 0.0f){
             mult = 3.0f; // pour tourner vite
         }
-        //player->runAnimTime += dt;
-        player->speed.x = approach(player->speed.x, -runSpeed, mult * runAcceleration * dt);
+        //player->runAnimTime += deltaTime;
+        player->speed.x = approach(player->speed.x, -runSpeed, mult * runAcceleration * deltaTime);
     }
 
     if (IsKeyDown(KEY_RIGHT) && timerIsDone(&noControlWallJumpTimer)){
@@ -266,17 +264,17 @@ void mouvement(Entity *player, Map map){
         if(player->speed.x < 0.0f){
             mult = 3.0f; // pour tourner vite
         }
-        //player->runAnimTime += dt;
-        player->speed.x = approach(player->speed.x, runSpeed, mult * runAcceleration * dt);
+        //player->runAnimTime += deltaTime;
+        player->speed.x = approach(player->speed.x, runSpeed, mult * runAcceleration * deltaTime);
     }
 
     // friction
     if(!IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT) && timerIsDone(&noControlWallJumpTimer)){
         if(player->grounded){
-            player->speed.x = approach(player->speed.x, 0, runReduce * dt);
+            player->speed.x = approach(player->speed.x, 0, runReduce * deltaTime);
         }
         else{
-            player->speed.x = approach(player->speed.x, 0, flyReduce * dt);
+            player->speed.x = approach(player->speed.x, 0, flyReduce * deltaTime);
         }
     }
 
@@ -295,16 +293,16 @@ void mouvement(Entity *player, Map map){
 
     // glide
     if (IsKeyDown(KEY_UP) && canGlide){
-        player->speed.y = approach(player->speed.y, glideSpeed, gravity * dt);
+        player->speed.y = approach(player->speed.y, glideSpeed, gravity * deltaTime);
         // animation gliding
     }
 
     else if (wallSliding){
-        player->speed.y = approach(player->speed.y, wallSlideSpeed, gravity * dt);
+        player->speed.y = approach(player->speed.y, wallSlideSpeed, gravity * deltaTime);
         // animation sliding selon direction
     }
     else { // gravitée
-        player->speed.y = approach(player->speed.y, fallSpeed, gravity * dt);
+        player->speed.y = approach(player->speed.y, fallSpeed, gravity * deltaTime);
     }
 
     // controler la hauteur du saut en appuyant plus ou moins longtemps

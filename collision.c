@@ -46,25 +46,3 @@ bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2){
     return false;
 }
 
-void rectToPoints(Hitbox *hitbox){
-    hitbox->A = (Vector2) {hitbox->x, hitbox->y};
-    hitbox->B = (Vector2) {hitbox->A.x + hitbox->width*cosf(hitbox->angle * PI/180), hitbox->A.y + hitbox->width*sinf(hitbox->angle * PI/180)};
-    hitbox->D = (Vector2) {hitbox->A.x - hitbox->height*sinf(hitbox->angle * PI/180), hitbox->A.y + hitbox->height*cosf(hitbox->angle * PI/180)};
-    hitbox->C = (Vector2) {hitbox->B.x + hitbox->D.x - hitbox->A.x, hitbox->B.y + hitbox->D.y - hitbox->A.y};
-}
-
-void updateHitboxEntity(Entity *ent){
-    /*
-    float angle = ent->angle*PI/180 + atanf((ent->texture.height - ent->hitbox.topOffset - ent->hitbox.bottomOffset) / (ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset));
-    float AB = ent->texture.height - ent->hitbox.bottomOffset - ent->hitbox.topOffset;
-    float BC = ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset;
-    float radius = 0.5f*sqrtf(AB*AB + BC*BC);
-
-    ent->hitbox.x = ent->position.x - radius*cosf(angle);
-    ent->hitbox.y = ent->position.y - radius*sinf(angle);
-    ent->hitbox.width = ent->texture.width - ent->hitbox.leftOffset - ent->hitbox.rightOffset;
-    ent->hitbox.height = ent->texture.height - ent->hitbox.topOffset - ent->hitbox.bottomOffset;
-    ent->hitbox.angle = ent->angle;
-    rectToPoints(&(ent->hitbox));
-    */
-}

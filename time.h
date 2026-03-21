@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "structures.h"
+#include "global.h"
 
 void startTimer(Timer* timer);
 void endTimer(Timer* timer);

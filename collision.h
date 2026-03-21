@@ -16,7 +16,6 @@ void updatePhysicsBoxEntity(Entity *ent);
 
 bool checkCollisionTriangles(Vector2 A1, Vector2 B1, Vector2 C1, Vector2 A2, Vector2 B2, Vector2 C2);
 bool checkCollisionHitboxes(Hitbox hitbox1, Hitbox hitbox2);
-void rectToPoints(Hitbox *hitbox);
-void updateHitboxEntity(Entity *ent);
+
 
 #endif // COLLISION_H

@@ -14,6 +14,5 @@ void drawBlockHitbox(int x, int y, Color color);
 void drawMap(Map map);
 void drawHitbox(Hitbox hitbox, Color color);
 void drawEntity(Entity ent);
-void drawItem(Item item);
 
 #endif // DRAW_H
