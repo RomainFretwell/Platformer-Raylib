@@ -1,8 +1,8 @@
 #include "draw.h"
 
 void drawCross(int x, int y, Color color){
-    DrawLine(0, y*screenRatio, currentScreenSize.x, y*screenRatio, color);
-    DrawLine(x*screenRatio, 0, x*screenRatio, currentScreenSize.y, color);
+    DrawLine(0, y, currentScreenSize.x, y, color);
+    DrawLine(x, 0, x, currentScreenSize.y, color);
 }
 
 void drawBlock(TileSet tileSet, int x, int y, int material, int variant){

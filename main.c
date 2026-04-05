@@ -215,8 +215,6 @@ int main(){
         // Toggle fullscreen
         if (IsKeyPressed(KEY_F11)){
             ToggleFullscreenWindow();
-
-            // besoin de ça ??
             camera.offset = (Vector2){currentScreenSize.x/2, currentScreenSize.y/2};
             camera.target = (Vector2){player.position.x * screenRatio, player.position.y * screenRatio};
         }
@@ -238,6 +236,12 @@ int main(){
         }
         if (IsKeyPressed(KEY_O)){
             camera.zoom -= 0.1;
+        }
+        if (IsKeyPressed(KEY_L)){
+            player.health -= 5;
+        }
+        if (IsKeyPressed(KEY_SEMICOLON)){ // M en azerty
+            player.health += 5;
         }
         
 
@@ -268,16 +272,31 @@ int main(){
         ClearBackground((Color){32, 36, 85, 255});
         DrawTextureEx(Texture_background_0, (Vector2){0, 0}, 0, screenRatio, WHITE);
         
-        limitCameraMap(&camera, mapDeTest);
-
         BeginMode2D(camera);
 
         if (!IsKeyDown(KEY_X)){
-            cameraFollow(&camera, player);
+            //cameraFollow(&camera, player);
+            
             //cameraFollow2(&camera, player);
             //int cameraFollowThresh = 120;
             //limitCameraFollow(&camera, player, cameraFollowThresh);
         }
+
+        Vector2 lookAhead = cameraLookAhead(50, player);
+
+        camera.target.x += 10 * (player.position.x*screenRatio - camera.target.x) * deltaTime;
+        camera.target.y += 5 * (player.position.y*screenRatio - camera.target.y) * deltaTime;
+        
+        Vector2 maxCameraDist = { .x = 120, .y = 80};
+        camera.target.x = constrainf(camera.target.x, (player.position.x - maxCameraDist.x)*screenRatio, (player.position.x + maxCameraDist.x)*screenRatio);
+        camera.target.y = constrainf(camera.target.y, (player.position.y - maxCameraDist.y)*screenRatio, (player.position.y + maxCameraDist.y)*screenRatio);
+        
+        //player.position.x*screenRatio + lookAhead.x;
+        //camera.target.y = player.position.y*screenRatio + lookAhead.y;
+        limitCameraMap(&camera, mapDeTest);
+        
+
+
 
         // level editor
         Vector2 mouseWorldPos;
@@ -320,10 +339,11 @@ int main(){
 
         EndMode2D();
 
-        // croix sur joueur -> problème plein écran
         if (showCross){
-            drawCross(GetWorldToScreen2D((Vector2){player.position.x, player.position.y}, camera).x, GetWorldToScreen2D((Vector2){player.position.x, player.position.y}, camera).y, WHITE);
+            drawCross(GetWorldToScreen2D((Vector2){player.position.x*screenRatio, player.position.y*screenRatio}, camera).x, GetWorldToScreen2D((Vector2){player.position.x*screenRatio, player.position.y*screenRatio}, camera).y, WHITE);
+            drawCross(GetWorldToScreen2D(camera.target, camera).x, GetWorldToScreen2D(camera.target, camera).y, RED);
         }
+        
 
         // affichage barre de vie
         DrawRectangleLinesEx((Rectangle){currentScreenSize.x - screenRatio*150, screenRatio*10, screenRatio*140, screenRatio*10}, screenRatio, WHITE);
@@ -346,10 +366,10 @@ int main(){
             int debugY = 35;
             int debugSpace = 8;
             int debugFontSize = screenRatio * 7;
-            const char * test1 = TextFormat("World position X = %d", player.position.x);
+            const char * test1 = TextFormat("World : player X = %d", player.position.x);
             DrawText(test1, debugX, debugY, debugFontSize, WHITE);
             debugY += screenRatio*debugSpace;
-            const char * test2 = TextFormat("World position Y = %d", player.position.y);
+            const char * test2 = TextFormat("World : player Y = %d", player.position.y);
             DrawText(test2, debugX, debugY, debugFontSize, WHITE);
             debugY += screenRatio*debugSpace;
             const char * test3 = TextFormat("speed X = %f", player.speed.x);
@@ -358,11 +378,11 @@ int main(){
             const char * test4 = TextFormat("speed Y = %f", player.speed.y);
             DrawText(test4, debugX, debugY, debugFontSize, WHITE);
             debugY += screenRatio*debugSpace;
-            Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x, player.position.y}, camera);
-            const char * test01 = TextFormat("Screen position X = %f", testScreen.x);
+            Vector2 testScreen = GetWorldToScreen2D((Vector2) {player.position.x * screenRatio, player.position.y * screenRatio}, camera);
+            const char * test01 = TextFormat("Screen : player X = %f", testScreen.x);
             DrawText(test01, debugX, debugY, debugFontSize, WHITE);
             debugY += screenRatio*debugSpace;
-            const char * test02 = TextFormat("Screen position Y = %f", testScreen.y);
+            const char * test02 = TextFormat("Screen : player Y = %f", testScreen.y);
             DrawText(test02, debugX, debugY, debugFontSize, WHITE);
             debugY += screenRatio*debugSpace * 2;
             // test mouse

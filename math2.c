@@ -37,6 +37,16 @@ int arrondir(float x){
     return (int) (x - 0.5f);
 }
 
+int constrain(int value, int min, int max){
+    value = (min<value)?value:min;
+    return (value<max)?value:max;
+}
+
+float constrainf(float value, float min, float max){
+    value = (min<value)?value:min;
+    return (value<max)?value:max;
+}
+
 float approach(float current, float target, float increase){
     if (current < target){
         return min(current + increase, target);
