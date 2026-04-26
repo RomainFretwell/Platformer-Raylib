@@ -282,17 +282,17 @@ int main(){
             //limitCameraFollow(&camera, player, cameraFollowThresh);
         }
 
-        Vector2 lookAhead = cameraLookAhead(50, player);
-
         camera.target.x += 10 * (player.position.x*screenRatio - camera.target.x) * deltaTime;
         camera.target.y += 5 * (player.position.y*screenRatio - camera.target.y) * deltaTime;
         
+        Vector2 lookAhead = cameraLookAhead(50, player);
+        camera.target.x += lookAhead.x;
+        //camera.target.y += lookAhead.y;
+
         Vector2 maxCameraDist = { .x = 120, .y = 80};
         camera.target.x = constrainf(camera.target.x, (player.position.x - maxCameraDist.x)*screenRatio, (player.position.x + maxCameraDist.x)*screenRatio);
         camera.target.y = constrainf(camera.target.y, (player.position.y - maxCameraDist.y)*screenRatio, (player.position.y + maxCameraDist.y)*screenRatio);
         
-        //player.position.x*screenRatio + lookAhead.x;
-        //camera.target.y = player.position.y*screenRatio + lookAhead.y;
         limitCameraMap(&camera, mapDeTest);
         
 

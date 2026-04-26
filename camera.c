@@ -52,13 +52,12 @@ void limitCameraFollow(Camera2D * camera, Entity player, int cameraFollowThresh)
 }
 
 Vector2 cameraLookAhead(int amount, Entity player){
-    float XlookAhead = 0;
-    float YlookAhead = 0;
-    if (player.direction == RIGHT) XlookAhead += amount;
-    else if (player.direction == LEFT) XlookAhead -= amount;
-    if (IsKeyDown(KEY_DOWN)) YlookAhead += amount;
-    if (IsKeyDown(KEY_UP)) YlookAhead -= amount;
-    return (Vector2){XlookAhead * screenRatio, YlookAhead * screenRatio};
+    Vector2 lookAhead = { .x = 0.0, .y = 0.0};
+    if (player.direction == RIGHT) lookAhead.x += amount;
+    else if (player.direction == LEFT) lookAhead.x -= amount;
+    if (IsKeyDown(KEY_DOWN)) lookAhead.y += amount;
+    if (IsKeyDown(KEY_UP)) lookAhead.y -= amount;
+    return lookAhead;
 }
 
 //void shakeCamera(Camera2D * camera, float intensity, float duration){

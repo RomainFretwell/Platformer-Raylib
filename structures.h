@@ -83,6 +83,15 @@ typedef struct{
 } Animation;
 
 
+// GameCamera
+typedef struct{
+    Camera2D camera;
+    Vector2 target;
+    float dampingSpeed;
+    Rectangle currentBounds; // limites camera de la salle où on est
+} GameCamera;
+
+
 // Entity
 typedef struct {
     IntVector2 position;
