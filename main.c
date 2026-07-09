@@ -71,7 +71,11 @@ void mapInTerminal(Map map){
 // ----------------------------------------------------------------------------------------
 
 int main(){
-    
+    printf("oui\n");
+    fflush(stdout);
+
+    printf("non\n");
+
     // Window initialization
     InitWindow(smallScreenSize.x, smallScreenSize.y, "jeu 2D avec Raylib");
     fullScreenSize.x = GetMonitorWidth(GetCurrentMonitor());
@@ -118,7 +122,7 @@ int main(){
         .animation.first = 0,
         .animation.last = 10, // nbFrames - 1
         .animation.current = player.animation.first,
-        .animation.step = 1,
+        .animation.step = 0, // 1
         .animation.frameSize = (IntVector2){64,48},
         .animation.origin = (IntVector2){32, 24},
         .animation.timer = (Timer){0.15f, 0.0f},
@@ -200,10 +204,15 @@ int main(){
     // autres variables
     bool showCross = false;
     bool showDebugInfo = false;
+    int temp = 0;
+
+    printf("banane\n");
+    printf("pomme\n");
+    printf("kiwi\n");
 
     // time variables
     deltaTime = 0.005f;
-    int maxFPS = 200;
+    int maxFPS = 200; // 200
     SetTargetFPS(maxFPS);
 
     // ----------------------------------------------------------------------------------------
@@ -280,8 +289,13 @@ int main(){
             //cameraFollow2(&camera, player);
             //int cameraFollowThresh = 120;
             //limitCameraFollow(&camera, player, cameraFollowThresh);
+
+            // test camera fixe
+            camera.target = (Vector2) {player.position.x * screenRatio, player.position.y * screenRatio};
+
         }
 
+        /*
         camera.target.x += 10 * (player.position.x*screenRatio - camera.target.x) * deltaTime;
         camera.target.y += 5 * (player.position.y*screenRatio - camera.target.y) * deltaTime;
         
@@ -292,6 +306,7 @@ int main(){
         Vector2 maxCameraDist = { .x = 120, .y = 80};
         camera.target.x = constrainf(camera.target.x, (player.position.x - maxCameraDist.x)*screenRatio, (player.position.x + maxCameraDist.x)*screenRatio);
         camera.target.y = constrainf(camera.target.y, (player.position.y - maxCameraDist.y)*screenRatio, (player.position.y + maxCameraDist.y)*screenRatio);
+        */
         
         limitCameraMap(&camera, mapDeTest);
         
@@ -322,6 +337,10 @@ int main(){
 
         moveSaw(&saw, 2.0f);
         DrawTextureEx(saw.texture, (Vector2){saw.position.x * screenRatio, saw.position.y * screenRatio}, 0, screenRatio, WHITE);
+
+        temp += 2.1; //max(1, player.speed.y);
+        if (temp>400) temp = 0; // 400 , 50
+        DrawTexturePro(player.texture, (Rectangle) {0, 0, 64, 48}, (Rectangle) {temp*screenRatio, 50*screenRatio, 64*screenRatio, 48*screenRatio},(Vector2){0,0},0,WHITE);
 
         // test scie en étoile
         for (int i=0; i<nbSawTest; i++){

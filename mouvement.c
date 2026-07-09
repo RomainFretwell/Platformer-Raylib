@@ -1,6 +1,6 @@
 #include "mouvement.h"
 
-const float runSpeed = 2.1f;
+const float runSpeed = 2.0f;
 const float runAcceleration = 10.0f;
 
 const float runReduce = 22.0f; 

@@ -8,6 +8,9 @@ ZIPNAME := Platformer.zip
 compile: $(SOURCES) $(HEAD)
 	gcc $(SOURCES) -lraylib -lm -o $(TARGET) -Wall -Wextra -O2
 
+debug: $(SOURCES) $(HEAD)
+	gcc $(SOURCES) -lraylib -lm -o $(TARGET) -Wall -Wextra -g -O0
+
 run:
 	./$(TARGET)
 

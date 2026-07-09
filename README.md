@@ -5,7 +5,7 @@ Objectif : faire un platformer dédié au speedrun dans un univers sci-fi. Il y 
 ## BUGS
 - régler problème de vitesse du jeu selon FPS
 - mettre une protection ou vérifier qu'on lit bien à des endroit valide de la mémoire pour les tableaux map.data et map.tiled sinon segmentation fault ou crash
-- joueur tremble quand float ET quand la caméra bouge (joueur et map ne tremblent pas si caméra immobile, comme dans un coin)
+- joueur tremble quand vitesse est un float et pas un IntVector2
 - on multiplie position par screenRatio donc on bouge de 3 pixels à chaque fois en grand écran (même si pas le vrai problème car on peut aussi voir sacadé en petit écran)
 
 ## TODO
